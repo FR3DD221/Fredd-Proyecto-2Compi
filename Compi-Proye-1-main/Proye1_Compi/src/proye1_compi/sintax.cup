@@ -1,0 +1,402 @@
+package proye1_compi;
+import java_cup.runtime.*;
+import java.util.HashMap; 
+import java.util.List;
+import java.util.ArrayList;
+
+parser code {:
+    // Connect this parser to a scanner!
+    Lexer lex;
+    HashMap<String, ArrayList<String>> scopePrograma = new HashMap<String, ArrayList<String>>();
+    String currentHash;
+    String globalHash = "SCOPE GLOBAL";
+
+    @SuppressWarnings("deprecation")
+    public Parser(Lexer lex) {
+        this.lex = lex;
+        this.symbolFactory = new DefaultSymbolFactory();
+    }
+
+    public void imprimirscopePrograma () {
+        System.out.println("\nTABLA DE SIMBOLOS");
+        for (String key: scopePrograma.keySet()) {
+            System.out.println("\n" + key);
+            System.out.println("Valores: ");
+            for (String item : scopePrograma.get(key)) {
+             System.out.println(item);
+            }
+            System.out.println("");
+        }
+    }
+
+    //recuperacion de errores de sintaxis
+    public void syntax_error(Symbol s) {
+        System.out.println("!!Error de Sintaxis en : " +  s.value + " linea: " +  (s.left+1) +  " columna: " +  (s.right+1));
+    }
+
+    //manejo de errores fatales
+    public void unrecovered_syntax_error(Symbol s) {
+        System.out.println("!!Error fatal en : " +  s.value + " linea: " +  (s.left+1) +  " columna: " +  (s.right+1));
+    } 
+:}
+
+/* define how to connect to the scanner! */
+//init with {: s.init(); :};
+//scan with {: return s.next_token(); :};
+init with {::};
+scan with {:return lex.next_token();:};
+
+
+/* Terminales (tokens returned by the scanner). */
+terminal            IDENTIFIER, SEMI, PLUS, MINUS, DMINUS, DPLUS, MINUSW, TIMES, UMINUS, PRODUCT, DIVISION, POWER, MODULUS, LPAREN, RPAREN, INTEGER_LITERAL;
+terminal Integer    NUMBER;        // our scanner provides numbers as integers
+terminal            DELIMETERBLOCK, ASIGNINTSARRAY, ASIGNCHARSARRAY, CHARSTR, INT, CHAR, FLOAT, BOOL, STRINGT, FUNC, MAIN, PARAM, COMA, STRING_LITERAL, EQEQ, BREAK, BOOLEAN, ABSTRACT, EQ, DOT;
+terminal            DIFF, NEGATION, GRATHER, GRATHERT, LOWER, LOWERT, COMPARATION, AND, OR, SEP;
+terminal            FLOATNUM;
+terminal            TRUE, FALSE;
+terminal            IF, ELSE, WHILE, FOR, IN, RANGE, SWITCH, CASE, ARRAY;
+terminal            LOC, GLOB, BRAKE, DEFAULT, RETURN, PRINT, INPUT;
+terminal            PARENTS, PARENTC, SQUARES, SQUAREC;
+terminal            ENDEXPR;
+
+/* No terminales */
+non terminal            expr_list;
+non terminal            Integer expr;// used to store evaluated subexpressions
+non terminal            SI, varIns, varAsig, BLOCK, compAritOp, factor, term, funcStruc, mainStruc, types, printStruc;
+non terminal            ifStruc, ifElseStruc, whileStruc, arrayIns, arrayAsig, arrayInsAsign, elementos, switchStruc, caseStruc, forStruc, numbers;
+non terminal            inputStruc, mainInitial, funInitial, exprP, exprLog, exprUni, opRel, opLog, arrayElement, paramStruc, paramList, paramFunc, funcInvo, GEN, arrayInsGl, varInsGl, varInsAsig, varInsAsigGl, arrayInsAsignGl;
+
+/* Orden de precedencia */
+precedence left PLUS, MINUSW;
+precedence left PRODUCT;
+precedence left DIVISION;
+
+/* The grammar rules */    
+
+start with SI;
+
+SI ::= {: scopePrograma.put(globalHash, new ArrayList<String>()); :} 
+    GEN {: imprimirscopePrograma(); :};
+
+GEN ::= funcStruc GEN | mainStruc GEN | arrayInsGl ENDEXPR GEN | varInsGl ENDEXPR GEN | varInsAsigGl 
+    | varInsAsigGl GEN | funcStruc | mainStruc | arrayInsGl ENDEXPR | varInsGl ENDEXPR | error | error GEN
+    | arrayInsAsignGl GEN | arrayInsAsignGl;  
+
+//Los distintos tipos que pueden tener una funcion o variable
+
+//Bloque que se usa para el codigo siga un rumbo, vease como la lista de posibles expresiones
+BLOCK  ::=  BLOCK exprP ENDEXPR
+       | BLOCK varAsig 
+       | BLOCK arrayInsGl ENDEXPR
+       | BLOCK varInsGl ENDEXPR
+       | BLOCK varInsAsigGl
+       | BLOCK arrayInsAsignGl
+       | BLOCK mainStruc
+       | BLOCK funcStruc 
+       | BLOCK varIns ENDEXPR
+       | BLOCK ifStruc 
+       | BLOCK ifElseStruc 
+       | BLOCK whileStruc 
+       | BLOCK switchStruc 
+       | BLOCK forStruc 
+       | BLOCK arrayIns ENDEXPR
+       | BLOCK varInsAsig 
+       | BLOCK arrayInsAsign
+       | BLOCK printStruc ENDEXPR
+       | BLOCK BREAK ENDEXPR
+       | BLOCK RETURN SEP exprP ENDEXPR
+       | BLOCK RETURN ENDEXPR
+       | BLOCK inputStruc
+       | exprP ENDEXPR
+       | arrayIns ENDEXPR
+       | arrayInsAsign
+       | mainStruc 
+       | funcStruc 
+       | varAsig    
+       | arrayInsGl ENDEXPR
+       | varInsGl ENDEXPR
+       | varInsAsigGl
+       | arrayInsAsignGl
+       | varInsAsig 
+       | varIns ENDEXPR
+       | ifStruc 
+       | ifElseStruc
+       | switchStruc
+       | forStruc
+       | whileStruc
+       | printStruc ENDEXPR
+       | BREAK ENDEXPR
+       | RETURN SEP exprP ENDEXPR
+       | RETURN ENDEXPR
+       | inputStruc
+       | error;
+
+
+numbers ::= INTEGER_LITERAL | FLOATNUM;
+
+//Operaciones aritmeticas simples entre dos numeros
+/* Reglas de producción para operaciones aritméticas */
+compAritOp ::= term
+             //| compAritOp MINPLS term  {: System.out.println("Se hizo MULTIPLESIMB"); :}
+             | compAritOp PLUS term   {: System.out.println("Se hizo SUMA"); :}
+             | compAritOp MINUSW term  {: System.out.println("Se hizo RESTA"); :};
+
+term       ::= factor
+             | term PRODUCT factor  {: System.out.println("Se hizo PRODUCTO"); :}
+             | term DIVISION factor {: System.out.println("Se hizo COCIENTE"); :}
+             | term POWER factor {: System.out.println("Se hizo POTENCIA"); :}
+             | term MODULUS factor {: System.out.println("Se hizo MODULO"); :};
+
+factor     ::= numbers
+             | MINUSW numbers
+             | STRING_LITERAL
+             | CHARSTR
+             | IDENTIFIER 
+             | IDENTIFIER DMINUS     
+             | IDENTIFIER DPLUS
+             | arrayElement
+             | paramList
+             | funcInvo
+             | MINUSW PARENTS compAritOp PARENTC
+             | PARENTS compAritOp PARENTC;  
+
+
+inputStruc ::= INPUT PARENTS IDENTIFIER PARENTC ENDEXPR;
+
+
+//Manejo de distintas expresiones de comparacion y union
+exprP ::= exprLog 
+      | compAritOp        
+      | exprUni;
+
+exprLog ::= compAritOp opRel compAritOp
+        | PARENTS exprLog PARENTC
+        | opRel exprLog
+        | TRUE
+        | FALSE;
+
+exprUni ::= exprLog opLog exprP       {: System.out.println("Se hizo 1"); :}
+        | IDENTIFIER opLog exprP                   {: System.out.println("Se hizo 2"); :}
+        | PARENTS exprUni PARENTC    {: System.out.println("Se hizo 3"); :};
+
+opRel ::= GRATHER | GRATHERT | LOWER | LOWERT | DIFF | COMPARATION | NEGATION;
+opLog ::= AND | OR;
+
+
+
+
+//Asignación de un valor a una variable
+varAsig      ::=  IDENTIFIER EQ exprP ENDEXPR       {:System.out.println("Se asigno VAR");:}
+             | EQ exprP ENDEXPR;
+
+
+//Instanciacion simple de variables
+    varIns       ::= LOC SEP INT SEP IDENTIFIER:ID    {: scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "INT"); :}    
+                 | LOC SEP CHAR SEP IDENTIFIER:ID     {: scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "CHAR"); :}      
+                 | LOC SEP FLOAT SEP IDENTIFIER:ID    {: scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "FLOAT"); :}
+                 | LOC SEP BOOL SEP IDENTIFIER:ID     {: scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "BOOL"); :}    
+                 | LOC SEP STRINGT SEP IDENTIFIER:ID  {: scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "STRING"); :};
+
+
+
+    varInsGl     ::=  GLOB SEP INT SEP IDENTIFIER:ID     {: scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "INT"); :}
+                 | GLOB SEP CHAR SEP IDENTIFIER:ID       {: scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "CHAR"); :}
+                 | GLOB SEP FLOAT SEP IDENTIFIER:ID      {: scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "FLOAT"); :}
+                 | GLOB SEP STRINGT SEP IDENTIFIER:ID    {: scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "STRING"); :}
+                 | GLOB SEP BOOL SEP IDENTIFIER:ID       {: scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "BOOL"); :};
+
+    varInsAsig   ::= varIns varAsig;
+
+    varInsAsigGl   ::= varInsGl varAsig;
+
+    
+    funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
+                            {:   String tipo;
+                                                             tipo = "tipo:func:INT";
+                                                             ArrayList<String> fun = new ArrayList<String>();
+                                                             currentHash = ID.toString();
+                                                             fun.add(tipo);
+                                                             scopePrograma.put(currentHash, fun);
+                            :}
+                 | FUNC SEP CHAR SEP IDENTIFIER:ID
+                            {:   String tipo;
+                                                             tipo = "tipo:func:CHAR";
+                                                             ArrayList<String> fun = new ArrayList<String>();
+                                                             currentHash = ID.toString();
+                                                             fun.add(tipo);
+                                                             scopePrograma.put(currentHash, fun);
+                            :}
+                 | FUNC SEP BOOL SEP IDENTIFIER:ID
+                            {:   String tipo;
+                                                             tipo = "tipo:func:BOOL";
+                                                             ArrayList<String> fun = new ArrayList<String>();
+                                                             currentHash = ID.toString();
+                                                             fun.add(tipo);
+                                                             scopePrograma.put(currentHash, fun);
+                            :}
+                 | FUNC SEP STRINGT SEP IDENTIFIER:ID
+                            {:   String tipo;
+                                                             tipo = "tipo:func:STRING";
+                                                             ArrayList<String> fun = new ArrayList<String>();
+                                                             currentHash = ID.toString();
+                                                             fun.add(tipo);
+                                                             scopePrograma.put(currentHash, fun);
+                            :}
+                 | FUNC SEP FLOAT SEP IDENTIFIER:ID
+                            {:   String tipo;
+                                                             tipo = "tipo:func:FLOAT";
+                                                             ArrayList<String> fun = new ArrayList<String>();
+                                                             currentHash = ID.toString();
+                                                             fun.add(tipo);
+                                                             scopePrograma.put(currentHash, fun);
+                            :};
+
+    //Declaracion inicial del bloque para las funciones
+    funcStruc    ::= 
+                 // funcion con return sin contenido
+                 funInitial DELIMETERBLOCK BLOCK RETURN ENDEXPR DELIMETERBLOCK  
+                 | funInitial DELIMETERBLOCK RETURN ENDEXPR DELIMETERBLOCK 
+                 // funcion con return con contenido  
+                 | funInitial DELIMETERBLOCK BLOCK RETURN SEP exprP ENDEXPR DELIMETERBLOCK
+                 | funInitial DELIMETERBLOCK RETURN SEP exprP ENDEXPR DELIMETERBLOCK;  
+
+mainInitial  ::= FUNC SEP INT SEP MAIN 
+                            {:                       String tipo;
+                                                         tipo = "tipo:MAIN:INT";
+                                                         ArrayList<String> fun = new ArrayList<String>();
+                                                         currentHash = "MAIN";
+                                                         fun.add(tipo);
+                                                         scopePrograma.put(currentHash, fun);
+                            :};
+
+mainStruc    ::= mainInitial DELIMETERBLOCK BLOCK RETURN ENDEXPR DELIMETERBLOCK  
+             | mainInitial DELIMETERBLOCK BLOCK RETURN SEP exprP ENDEXPR DELIMETERBLOCK
+             | mainInitial DELIMETERBLOCK RETURN ENDEXPR DELIMETERBLOCK
+             | mainInitial DELIMETERBLOCK RETURN SEP exprP ENDEXPR DELIMETERBLOCK;
+
+paramFunc    ::= exprP COMA paramFunc 
+             | exprP;
+
+funcInvo     ::= IDENTIFIER PARENTS paramFunc PARENTC
+             | IDENTIFIER PARENTS PARENTC;
+
+
+
+ifStruc      ::= IF PARENTS exprP PARENTC DELIMETERBLOCK BLOCK DELIMETERBLOCK   {:System.out.println("Se declaro estructura condicional IF");:};
+ifElseStruc  ::= ifStruc ELSE DELIMETERBLOCK BLOCK DELIMETERBLOCK;
+
+
+//Produccion while
+whileStruc   ::= WHILE PARENTS exprP PARENTC DELIMETERBLOCK BLOCK DELIMETERBLOCK   {:System.out.println("Se declaro el ciclo while");:};
+
+
+//Declaracion, asignacion y acceso a un array
+arrayIns ::=  LOC SEP INT SEP ARRAY SEP IDENTIFIER:ID SQUARES INTEGER_LITERAL SQUAREC {: scopePrograma.get(currentHash).add("Instancia LOC ARR: " + ID.toString() + ":" + "INT"); :}
+            | LOC SEP CHAR SEP ARRAY SEP IDENTIFIER:ID SQUARES INTEGER_LITERAL SQUAREC {: scopePrograma.get(currentHash).add("Instancia LOC ARR: " + ID.toString() + ":" + "CHAR"); :};
+
+arrayInsGl ::=  GLOB SEP INT SEP ARRAY SEP IDENTIFIER:ID SQUARES INTEGER_LITERAL SQUAREC  {: scopePrograma.get(globalHash).add("Instancia GLOB ARR: " + ID.toString() + ":" + "INT"); :}
+            | GLOB SEP CHAR SEP ARRAY SEP IDENTIFIER:ID SQUARES INTEGER_LITERAL SQUAREC {: scopePrograma.get(globalHash).add("Instancia GLOB ARR: " + ID.toString() + ":" + "CHAR"); :};
+
+//Declaracion de ARRAYS Y TODO LO RELACIONADO
+arrayAsig ::= IDENTIFIER EQ SQUARES elementos SQUAREC ENDEXPR
+          | EQ SQUARES elementos SQUAREC ENDEXPR;
+
+elementos ::= compAritOp COMA elementos| compAritOp;
+
+arrayInsAsign ::= arrayIns arrayAsig;
+
+arrayInsAsignGl ::= arrayInsGl arrayAsig;
+
+arrayElement ::= IDENTIFIER SQUARES INTEGER_LITERAL SQUAREC;
+
+
+//Declaracion de switch
+switchStruc ::= SWITCH PARENTS IDENTIFIER PARENTC DELIMETERBLOCK caseStruc DEFAULT SEP BLOCK DELIMETERBLOCK {:System.out.println("Se declaro estructura switch");:};
+caseStruc ::= CASE SEP compAritOp SEP BLOCK caseStruc
+          | CASE SEP compAritOp SEP BLOCK;
+
+
+//Declaracion de FOR
+forStruc ::= FOR SEP IDENTIFIER SEP IN SEP RANGE PARENTS exprP COMA exprP PARENTC DELIMETERBLOCK BLOCK DELIMETERBLOCK
+         | FOR SEP IDENTIFIER SEP IN SEP RANGE PARENTS exprP PARENTC DELIMETERBLOCK BLOCK DELIMETERBLOCK
+         | FOR SEP IDENTIFIER SEP IN SEP RANGE PARENTS exprP COMA exprP COMA exprP PARENTC DELIMETERBLOCK BLOCK DELIMETERBLOCK;
+
+
+//Declaracion de parametros
+paramStruc ::= PARAM SEP INT SEP IDENTIFIER:ID {: scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "INT"); :}
+      | PARAM SEP CHAR SEP IDENTIFIER:ID {: scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "CHAR"); :}
+      | PARAM SEP STRINGT SEP IDENTIFIER:ID {: scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "STRING"); :}
+      | PARAM SEP FLOAT SEP IDENTIFIER:ID {: scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "FLOAT"); :}
+      | PARAM SEP BOOL SEP IDENTIFIER:ID  {: scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "BOOL"); :}; 
+
+paramList ::= paramStruc paramList
+       | paramStruc;
+
+
+printStruc ::= PRINT PARENTS numbers PARENTC
+           | PRINT PARENTS IDENTIFIER PARENTC
+           | PRINT PARENTS STRING_LITERAL PARENTC;
+
+
+//Manejo de errores
+
+error ::= 
+    error SEMI {: System.out.println("Error de sintaxis: se esperaba ; "); :}
+    | error ENDEXPR {: System.out.println("Error de sintaxis: se esperaba ; "); :}
+    | error SEP {: System.out.println("Error de sintaxis: se esperaba : "); :}
+    | error IDENTIFIER {: System.out.println("Error de sintaxis: se esperaba un identificador "); :}
+    | error PLUS {: System.out.println("Error de sintaxis: se esperaba + "); :}
+    | error MINUSW {: System.out.println("Error de sintaxis: se esperaba - "); :}
+    | error PRODUCT {: System.out.println("Error de sintaxis: se esperaba * "); :}
+    | error DIVISION {: System.out.println("Error de sintaxis: se esperaba / "); :}
+    | error POWER {: System.out.println("Error de sintaxis: se esperaba ^ "); :}
+    | error MODULUS {: System.out.println("Error de sintaxis: se esperaba % "); :}
+    | error STRINGT {: System.out.println("Error de sintaxis: se esperaba un string "); :}
+    | error EQ {: System.out.println("Error de sintaxis: se esperaba = "); :}
+    | error EQEQ {: System.out.println("Error de sintaxis: se esperaba == "); :}
+    | error ABSTRACT {: System.out.println("Error de sintaxis: se esperaba una expresion abstracta "); :}
+    | error BOOLEAN {: System.out.println("Error de sintaxis: se esperaba una expresion booleana "); :}
+    | error INT {: System.out.println("Error de sintaxis: se esperaba int "); :}
+    | error CHAR {: System.out.println("Error de sintaxis: se esperaba char "); :}
+    | error FLOAT {: System.out.println("Error de sintaxis: se esperaba float "); :}
+    | error BOOL {: System.out.println("Error de sintaxis: se esperaba bool "); :}
+    | error BREAK {: System.out.println("Error de sintaxis: se esperaba break "); :}
+    | error DOT {: System.out.println("Error de sintaxis: se esperaba . "); :}
+    | error INTEGER_LITERAL {: System.out.println("Error de sintaxis: La expresion no corresponde con un numero "); :}
+    | error FLOATNUM {: System.out.println("Error de sintaxis: La expresion debe ser un numero flotante "); :}
+    | error TRUE {: System.out.println("Error de sintaxis: se esperaba true "); :}
+    | error FALSE {: System.out.println("Error de sintaxis: se esperaba false "); :}
+    | error DELIMETERBLOCK {: System.out.println("Error de sintaxis: se esperaba _ "); :}
+    | error IF {: System.out.println("Error de sintaxis: se esperaba if "); :}
+    | error ELSE {: System.out.println("Error de sintaxis: se esperaba else "); :}
+    | error SWITCH {: System.out.println("Error de sintaxis: se esperaba switch "); :}
+    | error CASE {: System.out.println("Error de sintaxis: se esperaba case "); :}
+    | error FOR {: System.out.println("Error de sintaxis: se esperaba for "); :}
+    | error WHILE {: System.out.println("Error de sintaxis: se esperaba while "); :}
+    | error IN {: System.out.println("Error de sintaxis: se esperaba in "); :}
+    | error RANGE {: System.out.println("Error de sintaxis: se esperaba range "); :}
+    | error GRATHER {: System.out.println("Error de sintaxis: se esperaba > "); :}
+    | error LOWER {: System.out.println("Error de sintaxis: se esperaba < "); :}
+    | error GRATHERT {: System.out.println("Error de sintaxis: se esperaba >= "); :}
+    | error LOWERT {: System.out.println("Error de sintaxis: se esperaba <= "); :}
+    | error COMPARATION {: System.out.println("Error de sintaxis: se esperaba == "); :}
+    | error DIFF {: System.out.println("Error de sintaxis: se esperaba != "); :}
+    | error NEGATION {: System.out.println("Error de sintaxis: se esperaba ! "); :}
+    | error AND {: System.out.println("Error de sintaxis: se esperaba && "); :}
+    | error OR {: System.out.println("Error de sintaxis: se esperaba || "); :}
+    | error FUNC {: System.out.println("Error de sintaxis: se esperaba func "); :}
+    | error MAIN {: System.out.println("Error de sintaxis: se esperaba main "); :}
+    | error PARAM {: System.out.println("Error de sintaxis: se esperaba un parametro "); :}
+    | error PARENTS {: System.out.println("Error de sintaxis: se esperaba ( "); :}
+    | error PARENTC {: System.out.println("Error de sintaxis: se esperaba ) "); :}
+    | error SQUARES {: System.out.println("Error de sintaxis: se esperaba [ "); :}
+    | error SQUAREC {: System.out.println("Error de sintaxis: se esperaba ] "); :}
+    | error LOC {: System.out.println("Error de sintaxis: se esperaba loc "); :}
+    | error GLOB {: System.out.println("Error de sintaxis: se esperaba glob "); :}
+    | error RETURN {: System.out.println("Error de sintaxis: se esperaba return "); :}
+    | error DEFAULT {: System.out.println("Error de sintaxis: se esperaba default "); :}
+    | error BRAKE {: System.out.println("Error de sintaxis: se esperaba brake "); :}
+    | error PRINT {: System.out.println("Error de sintaxis: se esperaba print "); :}
+    | error INPUT {: System.out.println("Error de sintaxis: se esperaba input "); :};
+
+

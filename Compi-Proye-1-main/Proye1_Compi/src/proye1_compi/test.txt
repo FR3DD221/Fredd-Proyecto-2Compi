@@ -1,0 +1,61 @@
+ func:int:main_
+	loc:bool:b1;
+	loc:string:s1;
+	read(s1); //semantico
+	print(b1); //semantico
+	//print(true); //semantico
+	//print(-6.7);
+	return;
+	return:1+f();
+_
+
+func:float:miFunc_
+	param:int:dif; //sintactico
+	param:char:otra;
+	loc:int:otra;
+	loc:string:str="Hola $%&/#$&) mundo";
+	for:i:in:range(i+10,3*2)
+	_
+		while(var2>12.2 && 12>(34+35)) //semantico
+		_
+			glob:int:var = var - 1; //semantico
+		_
+
+		if (var==0)
+		_
+			print("entra al if");
+		_
+		if(true)
+		_
+			print(var);
+		_
+		else
+		_
+			switch(otra) //semantico
+			_
+				case:1:
+					print("!#");
+                                        break;
+				case:2:
+					otra = 10;
+					break;
+				default:
+					otra = -10.5 * -1.9;
+			_
+			switch(otra2) //semantico
+			_
+				case:10:
+					print("un case");
+                                        break;
+				default:
+					otra = -10.5 * -1.9;
+			_
+		_
+	_
+	return:1; //semantico
+_
+
+func:bool:miOtraFun_
+        loc:int:x = 0;
+	return:-5.6; //semantico
+_
