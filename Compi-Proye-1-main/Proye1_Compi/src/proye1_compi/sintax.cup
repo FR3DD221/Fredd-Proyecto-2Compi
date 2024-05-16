@@ -17,13 +17,49 @@ parser code {:
         this.symbolFactory = new DefaultSymbolFactory();
     }
 
+    public boolean existeVar(String ID, String tipo) {
+        ArrayList<String> ts = scopePrograma.get(currentHash);
+        String comparado = "Instancia loc: " + ID.toString() + ":" + tipo;
+
+        for (String variable : ts) {
+            if (variable.equals(comparado)) {return true;}
+        }
+
+        return false;
+    }
+
+    public boolean existeVarGlob(String ID, String tipo) {
+        ArrayList<String> ts = scopePrograma.get(globalHash);
+        String comparado = "Instancia GLOB: " + ID.toString() + ":" + tipo;
+        
+        for (String variable : ts) {
+            if (variable.equals(comparado)) {return true;}
+        }
+
+        return false;
+    }
+
+    public boolean existeFun(String ID, String tipo) {
+        for (String key : scopePrograma.keySet()) {
+            ArrayList<String> value = scopePrograma.get(key);
+            for (String elemento : value) {
+                String[] ts = elemento.split(":");
+                if (ts.length >= 3 && ts[1].equals("func") && ts[2].equals(tipo) && ID.equals(key)) {
+                    return true;
+                }
+            }
+        } 
+
+        return false;
+    }
+
     public void imprimirscopePrograma () {
         System.out.println("\nTABLA DE SIMBOLOS");
         for (String key: scopePrograma.keySet()) {
             System.out.println("\n" + key);
             System.out.println("Valores: ");
             for (String item : scopePrograma.get(key)) {
-             System.out.println(item);
+                System.out.println(item);
             }
             System.out.println("");
         }
@@ -191,19 +227,59 @@ varAsig      ::=  IDENTIFIER EQ exprP ENDEXPR       {:System.out.println("Se asi
 
 
 //Instanciacion simple de variables
-    varIns       ::= LOC SEP INT SEP IDENTIFIER:ID    {: scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "INT"); :}    
-                 | LOC SEP CHAR SEP IDENTIFIER:ID     {: scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "CHAR"); :}      
-                 | LOC SEP FLOAT SEP IDENTIFIER:ID    {: scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "FLOAT"); :}
-                 | LOC SEP BOOL SEP IDENTIFIER:ID     {: scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "BOOL"); :}    
-                 | LOC SEP STRINGT SEP IDENTIFIER:ID  {: scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "STRING"); :};
+    varIns       ::= LOC SEP INT SEP IDENTIFIER:ID    {:
+                                                        boolean existe = existeVar(ID.toString(), "INT");
+                                                        if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
+                                                        scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "INT");   
+                                                        :}
+                 | LOC SEP CHAR SEP IDENTIFIER:ID     {: 
+                                                        boolean existe = existeVar(ID.toString(), "CHAR");
+                                                        if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
+                                                        scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "CHAR");  
+                                                        :}   
+                 | LOC SEP FLOAT SEP IDENTIFIER:ID    {: 
+                                                        boolean existe = existeVar(ID.toString(), "FLOAT");
+                                                        if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");} 
+                                                        scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "FLOAT");  
+                                                        :}
+                 | LOC SEP BOOL SEP IDENTIFIER:ID     {: 
+                                                        boolean existe = existeVar(ID.toString(), "BOOL");
+                                                        if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
+                                                        scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "BOOL");  
+                                                        :}  
+                 | LOC SEP STRINGT SEP IDENTIFIER:ID  {: 
+                                                        boolean existe = existeVar(ID.toString(), "STRING");
+                                                        if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");} 
+                                                        scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "STRING"); 
+                                                        :};
 
 
 
-    varInsGl     ::=  GLOB SEP INT SEP IDENTIFIER:ID     {: scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "INT"); :}
-                 | GLOB SEP CHAR SEP IDENTIFIER:ID       {: scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "CHAR"); :}
-                 | GLOB SEP FLOAT SEP IDENTIFIER:ID      {: scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "FLOAT"); :}
-                 | GLOB SEP STRINGT SEP IDENTIFIER:ID    {: scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "STRING"); :}
-                 | GLOB SEP BOOL SEP IDENTIFIER:ID       {: scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "BOOL"); :};
+    varInsGl     ::=  GLOB SEP INT SEP IDENTIFIER:ID     {: 
+                                                            boolean existe = existeVarGlob(ID.toString(), "INT");
+                                                            if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
+                                                            scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "INT"); 
+                                                            :}
+                 | GLOB SEP CHAR SEP IDENTIFIER:ID       {:          
+                                                            boolean existe = existeVarGlob(ID.toString(), "CHAR");
+                                                            if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");} 
+                                                            scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "CHAR"); 
+                                                            :}
+                 | GLOB SEP FLOAT SEP IDENTIFIER:ID      {:
+                                                            boolean existe = existeVarGlob(ID.toString(), "FLOAT");
+                                                            if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
+                                                            scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "FLOAT"); 
+                                                            :}
+                 | GLOB SEP STRINGT SEP IDENTIFIER:ID    {:
+                                                            boolean existe = existeVarGlob(ID.toString(), "STRING");
+                                                            if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
+                                                            scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "STRING"); 
+                                                            :}
+                 | GLOB SEP BOOL SEP IDENTIFIER:ID       {: 
+                                                            boolean existe = existeVarGlob(ID.toString(), "BOOL");
+                                                            if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
+                                                            scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "BOOL"); 
+                                                            :};
 
     varInsAsig   ::= varIns varAsig;
 
@@ -212,6 +288,8 @@ varAsig      ::=  IDENTIFIER EQ exprP ENDEXPR       {:System.out.println("Se asi
     
     funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                             {:   String tipo;
+                                                             boolean existe = existeFun(ID.toString(), "INT");
+                                                             if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
                                                              tipo = "tipo:func:INT";
                                                              ArrayList<String> fun = new ArrayList<String>();
                                                              currentHash = ID.toString();
@@ -220,6 +298,8 @@ varAsig      ::=  IDENTIFIER EQ exprP ENDEXPR       {:System.out.println("Se asi
                             :}
                  | FUNC SEP CHAR SEP IDENTIFIER:ID
                             {:   String tipo;
+                                                             boolean existe = existeFun(ID.toString(), "CHAR");
+                                                             if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
                                                              tipo = "tipo:func:CHAR";
                                                              ArrayList<String> fun = new ArrayList<String>();
                                                              currentHash = ID.toString();
@@ -228,6 +308,8 @@ varAsig      ::=  IDENTIFIER EQ exprP ENDEXPR       {:System.out.println("Se asi
                             :}
                  | FUNC SEP BOOL SEP IDENTIFIER:ID
                             {:   String tipo;
+                                                             boolean existe = existeFun(ID.toString(), "BOOL");
+                                                             if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
                                                              tipo = "tipo:func:BOOL";
                                                              ArrayList<String> fun = new ArrayList<String>();
                                                              currentHash = ID.toString();
@@ -236,6 +318,8 @@ varAsig      ::=  IDENTIFIER EQ exprP ENDEXPR       {:System.out.println("Se asi
                             :}
                  | FUNC SEP STRINGT SEP IDENTIFIER:ID
                             {:   String tipo;
+                                                             boolean existe = existeFun(ID.toString(), "STRING");
+                                                             if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
                                                              tipo = "tipo:func:STRING";
                                                              ArrayList<String> fun = new ArrayList<String>();
                                                              currentHash = ID.toString();
@@ -244,6 +328,8 @@ varAsig      ::=  IDENTIFIER EQ exprP ENDEXPR       {:System.out.println("Se asi
                             :}
                  | FUNC SEP FLOAT SEP IDENTIFIER:ID
                             {:   String tipo;
+                                                             boolean existe = existeFun(ID.toString(), "FLOAT");
+                                                             if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
                                                              tipo = "tipo:func:FLOAT";
                                                              ArrayList<String> fun = new ArrayList<String>();
                                                              currentHash = ID.toString();
@@ -261,12 +347,14 @@ varAsig      ::=  IDENTIFIER EQ exprP ENDEXPR       {:System.out.println("Se asi
                  | funInitial DELIMETERBLOCK RETURN SEP exprP ENDEXPR DELIMETERBLOCK;  
 
 mainInitial  ::= FUNC SEP INT SEP MAIN 
-                            {:                       String tipo;
-                                                         tipo = "tipo:MAIN:INT";
-                                                         ArrayList<String> fun = new ArrayList<String>();
-                                                         currentHash = "MAIN";
-                                                         fun.add(tipo);
-                                                         scopePrograma.put(currentHash, fun);
+                        {:                              
+                                                        if (scopePrograma.get("MAIN") != null) {System.out.println("Ya existe una funcion main");}
+                                                        String tipo;
+                                                        tipo = "tipo:MAIN:INT";
+                                                        ArrayList<String> fun = new ArrayList<String>();
+                                                        currentHash = "MAIN";
+                                                        fun.add(tipo);
+                                                        scopePrograma.put(currentHash, fun);
                             :};
 
 mainStruc    ::= mainInitial DELIMETERBLOCK BLOCK RETURN ENDEXPR DELIMETERBLOCK  

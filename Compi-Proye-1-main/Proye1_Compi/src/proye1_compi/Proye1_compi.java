@@ -99,7 +99,7 @@ public class Proye1_compi {
         writer.write(content);
         // Es importante cerrar el escritor después de haber terminado de escribir
         writer.close();
-        System.out.println("El archivo se ha escrito correctamente.");
+        System.out.println("El archivo se ha escrito correctamente.\n");
     }    
 
     

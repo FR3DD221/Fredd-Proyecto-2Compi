@@ -1302,13 +1302,49 @@ return lex.next_token();
         this.symbolFactory = new DefaultSymbolFactory();
     }
 
+    public boolean existeVar(String ID, String tipo) {
+        ArrayList<String> ts = scopePrograma.get(currentHash);
+        String comparado = "Instancia loc: " + ID.toString() + ":" + tipo;
+
+        for (String variable : ts) {
+            if (variable.equals(comparado)) {return true;}
+        }
+
+        return false;
+    }
+
+    public boolean existeVarGlob(String ID, String tipo) {
+        ArrayList<String> ts = scopePrograma.get(globalHash);
+        String comparado = "Instancia GLOB: " + ID.toString() + ":" + tipo;
+        
+        for (String variable : ts) {
+            if (variable.equals(comparado)) {return true;}
+        }
+
+        return false;
+    }
+
+    public boolean existeFun(String ID, String tipo) {
+        for (String key : scopePrograma.keySet()) {
+            ArrayList<String> value = scopePrograma.get(key);
+            for (String elemento : value) {
+                String[] ts = elemento.split(":");
+                if (ts.length >= 3 && ts[1].equals("func") && ts[2].equals(tipo) && ID.equals(key)) {
+                    return true;
+                }
+            }
+        } 
+
+        return false;
+    }
+
     public void imprimirscopePrograma () {
         System.out.println("\nTABLA DE SIMBOLOS");
         for (String key: scopePrograma.keySet()) {
             System.out.println("\n" + key);
             System.out.println("Valores: ");
             for (String item : scopePrograma.get(key)) {
-             System.out.println(item);
+                System.out.println(item);
             }
             System.out.println("");
         }
@@ -2326,7 +2362,11 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "INT"); 
+		
+                                                        boolean existe = existeVar(ID.toString(), "INT");
+                                                        if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
+                                                        scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "INT");   
+                                                        
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varIns",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2338,7 +2378,11 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "CHAR"); 
+		 
+                                                        boolean existe = existeVar(ID.toString(), "CHAR");
+                                                        if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
+                                                        scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "CHAR");  
+                                                        
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varIns",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2350,7 +2394,11 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "FLOAT"); 
+		 
+                                                        boolean existe = existeVar(ID.toString(), "FLOAT");
+                                                        if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");} 
+                                                        scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "FLOAT");  
+                                                        
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varIns",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2362,7 +2410,11 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "BOOL"); 
+		 
+                                                        boolean existe = existeVar(ID.toString(), "BOOL");
+                                                        if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
+                                                        scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "BOOL");  
+                                                        
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varIns",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2374,7 +2426,11 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "STRING"); 
+		 
+                                                        boolean existe = existeVar(ID.toString(), "STRING");
+                                                        if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");} 
+                                                        scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "STRING"); 
+                                                        
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varIns",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2386,7 +2442,11 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "INT"); 
+		 
+                                                            boolean existe = existeVarGlob(ID.toString(), "INT");
+                                                            if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
+                                                            scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "INT"); 
+                                                            
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varInsGl",39, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2398,7 +2458,11 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "CHAR"); 
+		          
+                                                            boolean existe = existeVarGlob(ID.toString(), "CHAR");
+                                                            if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");} 
+                                                            scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "CHAR"); 
+                                                            
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varInsGl",39, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2410,7 +2474,11 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "FLOAT"); 
+		
+                                                            boolean existe = existeVarGlob(ID.toString(), "FLOAT");
+                                                            if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
+                                                            scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "FLOAT"); 
+                                                            
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varInsGl",39, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2422,7 +2490,11 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "STRING"); 
+		
+                                                            boolean existe = existeVarGlob(ID.toString(), "STRING");
+                                                            if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
+                                                            scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "STRING"); 
+                                                            
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varInsGl",39, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2434,7 +2506,11 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "BOOL"); 
+		 
+                                                            boolean existe = existeVarGlob(ID.toString(), "BOOL");
+                                                            if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
+                                                            scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "BOOL"); 
+                                                            
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varInsGl",39, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2465,6 +2541,8 @@ class CUP$Parser$actions {
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		   String tipo;
+                                                             boolean existe = existeFun(ID.toString(), "INT");
+                                                             if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
                                                              tipo = "tipo:func:INT";
                                                              ArrayList<String> fun = new ArrayList<String>();
                                                              currentHash = ID.toString();
@@ -2483,6 +2561,8 @@ class CUP$Parser$actions {
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		   String tipo;
+                                                             boolean existe = existeFun(ID.toString(), "CHAR");
+                                                             if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
                                                              tipo = "tipo:func:CHAR";
                                                              ArrayList<String> fun = new ArrayList<String>();
                                                              currentHash = ID.toString();
@@ -2501,6 +2581,8 @@ class CUP$Parser$actions {
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		   String tipo;
+                                                             boolean existe = existeFun(ID.toString(), "BOOL");
+                                                             if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
                                                              tipo = "tipo:func:BOOL";
                                                              ArrayList<String> fun = new ArrayList<String>();
                                                              currentHash = ID.toString();
@@ -2519,6 +2601,8 @@ class CUP$Parser$actions {
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		   String tipo;
+                                                             boolean existe = existeFun(ID.toString(), "STRING");
+                                                             if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
                                                              tipo = "tipo:func:STRING";
                                                              ArrayList<String> fun = new ArrayList<String>();
                                                              currentHash = ID.toString();
@@ -2537,6 +2621,8 @@ class CUP$Parser$actions {
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		   String tipo;
+                                                             boolean existe = existeFun(ID.toString(), "FLOAT");
+                                                             if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
                                                              tipo = "tipo:func:FLOAT";
                                                              ArrayList<String> fun = new ArrayList<String>();
                                                              currentHash = ID.toString();
@@ -2587,12 +2673,14 @@ class CUP$Parser$actions {
           case 128: // mainInitial ::= FUNC SEP INT SEP MAIN 
             {
               Object RESULT =null;
-		                       String tipo;
-                                                         tipo = "tipo:MAIN:INT";
-                                                         ArrayList<String> fun = new ArrayList<String>();
-                                                         currentHash = "MAIN";
-                                                         fun.add(tipo);
-                                                         scopePrograma.put(currentHash, fun);
+		                              
+                                                        if (scopePrograma.get("MAIN") != null) {System.out.println("Ya existe una funcion main");}
+                                                        String tipo;
+                                                        tipo = "tipo:MAIN:INT";
+                                                        ArrayList<String> fun = new ArrayList<String>();
+                                                        currentHash = "MAIN";
+                                                        fun.add(tipo);
+                                                        scopePrograma.put(currentHash, fun);
                             
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("mainInitial",25, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
