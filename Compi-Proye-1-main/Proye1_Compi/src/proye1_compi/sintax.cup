@@ -28,6 +28,54 @@ parser code {:
         return false;
     }
 
+    public boolean existeVarNoT(String ID) {
+        ArrayList<String> ts = scopePrograma.get(currentHash);
+        ArrayList<String> ts2 = scopePrograma.get(globalHash);
+
+        for (String variable : ts) {
+            String[] elementosVar = variable.split(":");
+            if (elementosVar[1].equals(ID)) {return true;}
+        }
+
+        for (String variable : ts2) {
+            String[] elementosVar = variable.split(":");
+            if (elementosVar[1].equals(ID)) {return true;}
+        }
+
+        return false;
+    }
+
+    public String getTipo(String ID) {
+        ArrayList<String> ts = scopePrograma.get(currentHash);
+        ArrayList<String> ts2 = scopePrograma.get(globalHash);
+
+        for (String variable : ts) {
+            String[] elementosVar = variable.split(":");
+            if (elementosVar[1].equals(ID)) {return elementosVar[2];}
+        }
+
+        for (String variable : ts2) {
+            String[] elementosVar = variable.split(":");
+            if (elementosVar[1].equals(ID)) {return elementosVar[2];}
+        }
+
+        return "null";
+    }
+
+    public String getTipoFunc(String ID) {
+        for (String key : scopePrograma.keySet()) {
+            ArrayList<String> value = scopePrograma.get(key);
+            for (String elemento : value) {
+                String[] ts = elemento.split(":");
+                if (ID.equals(key)) {
+                    return ts[2];
+                }
+            }
+        } 
+
+        return "null";
+    }
+
     public boolean existeVarGlob(String ID, String tipo) {
         ArrayList<String> ts = scopePrograma.get(globalHash);
         String comparado = "Instancia GLOB: " + ID.toString() + ":" + tipo;
@@ -112,7 +160,7 @@ precedence left DIVISION;
 start with SI;
 
 SI ::= {: scopePrograma.put(globalHash, new ArrayList<String>()); :} 
-    GEN {: imprimirscopePrograma(); :};
+    GEN; //{: imprimirscopePrograma(); :}
 
 GEN ::= funcStruc GEN | mainStruc GEN | arrayInsGl ENDEXPR GEN | varInsGl ENDEXPR GEN | varInsAsigGl 
     | varInsAsigGl GEN | funcStruc | mainStruc | arrayInsGl ENDEXPR | varInsGl ENDEXPR | error | error GEN
@@ -121,78 +169,79 @@ GEN ::= funcStruc GEN | mainStruc GEN | arrayInsGl ENDEXPR GEN | varInsGl ENDEXP
 //Los distintos tipos que pueden tener una funcion o variable
 
 //Bloque que se usa para el codigo siga un rumbo, vease como la lista de posibles expresiones
-BLOCK  ::=  BLOCK exprP ENDEXPR
-       | BLOCK varAsig 
-       | BLOCK arrayInsGl ENDEXPR
-       | BLOCK varInsGl ENDEXPR
-       | BLOCK varInsAsigGl
-       | BLOCK arrayInsAsignGl
-       | BLOCK mainStruc
-       | BLOCK funcStruc 
-       | BLOCK varIns ENDEXPR
-       | BLOCK ifStruc 
-       | BLOCK ifElseStruc 
-       | BLOCK whileStruc 
-       | BLOCK switchStruc 
-       | BLOCK forStruc 
-       | BLOCK arrayIns ENDEXPR
-       | BLOCK varInsAsig 
-       | BLOCK arrayInsAsign
-       | BLOCK printStruc ENDEXPR
-       | BLOCK BREAK ENDEXPR
-       | BLOCK RETURN SEP exprP ENDEXPR
-       | BLOCK RETURN ENDEXPR
-       | BLOCK inputStruc
-       | exprP ENDEXPR
-       | arrayIns ENDEXPR
-       | arrayInsAsign
-       | mainStruc 
-       | funcStruc 
-       | varAsig    
-       | arrayInsGl ENDEXPR
-       | varInsGl ENDEXPR
-       | varInsAsigGl
-       | arrayInsAsignGl
-       | varInsAsig 
-       | varIns ENDEXPR
-       | ifStruc 
-       | ifElseStruc
-       | switchStruc
-       | forStruc
-       | whileStruc
-       | printStruc ENDEXPR
-       | BREAK ENDEXPR
-       | RETURN SEP exprP ENDEXPR
-       | RETURN ENDEXPR
-       | inputStruc
-       | error;
+BLOCK ::= BLOCK exprP ENDEXPR
+        | BLOCK varAsig 
+        | BLOCK arrayInsGl ENDEXPR
+        | BLOCK varInsGl ENDEXPR
+        | BLOCK varInsAsigGl
+        | BLOCK arrayInsAsignGl
+        | BLOCK mainStruc
+        | BLOCK funcStruc 
+        | BLOCK varIns ENDEXPR
+        | BLOCK ifStruc 
+        | BLOCK ifElseStruc 
+        | BLOCK whileStruc 
+        | BLOCK switchStruc 
+        | BLOCK forStruc 
+        | BLOCK arrayIns ENDEXPR
+        | BLOCK varInsAsig 
+        | BLOCK arrayInsAsign
+        | BLOCK printStruc ENDEXPR
+        | BLOCK BREAK ENDEXPR
+        | BLOCK RETURN SEP exprP ENDEXPR
+        | BLOCK RETURN ENDEXPR
+        | BLOCK inputStruc
+        | exprP ENDEXPR
+        | arrayIns ENDEXPR
+        | arrayInsAsign
+        | mainStruc 
+        | funcStruc 
+        | varAsig    
+        | arrayInsGl ENDEXPR
+        | varInsGl ENDEXPR
+        | varInsAsigGl
+        | arrayInsAsignGl
+        | varInsAsig 
+        | varIns ENDEXPR
+        | ifStruc 
+        | ifElseStruc
+        | switchStruc
+        | forStruc
+        | whileStruc
+        | printStruc ENDEXPR
+        | BREAK ENDEXPR
+        | RETURN SEP exprP ENDEXPR
+        | RETURN ENDEXPR
+        | inputStruc
+        | error;
 
 
-numbers ::= INTEGER_LITERAL | FLOATNUM;
+numbers ::= INTEGER_LITERAL {:RESULT = "INT";:}
+        | FLOATNUM {:RESULT = "FLOAT";:};
 
 //Operaciones aritmeticas simples entre dos numeros
 /* Reglas de producción para operaciones aritméticas */
-compAritOp ::= term
+compAritOp ::= term:op2 {:RESULT = op2;:}
              //| compAritOp MINPLS term  {: System.out.println("Se hizo MULTIPLESIMB"); :}
-             | compAritOp PLUS term   {: System.out.println("Se hizo SUMA"); :}
-             | compAritOp MINUSW term  {: System.out.println("Se hizo RESTA"); :};
+             | compAritOp:op1 PLUS term:op2  {: if(!op1.equals(op2)) {System.out.println("Error semantico, en esta suma los operadores deben ser del mismo tipo");} :}
+             | compAritOp:op1 MINUSW term:op2  {: if(!op1.equals(op2)) {System.out.println("Error semantico, en esta resta los operadores deben ser del mismo tipo");} :};
 
-term       ::= factor
-             | term PRODUCT factor  {: System.out.println("Se hizo PRODUCTO"); :}
-             | term DIVISION factor {: System.out.println("Se hizo COCIENTE"); :}
-             | term POWER factor {: System.out.println("Se hizo POTENCIA"); :}
-             | term MODULUS factor {: System.out.println("Se hizo MODULO"); :};
+term       ::= factor:op2 {:RESULT = op2;:}
+             | term:op1 PRODUCT factor:op2  {: if(!op1.equals(op2)) {System.out.println("Error semantico, en este producto los operadores deben ser del mismo tipo");}:}
+             | term:op1 DIVISION factor:op2  {: if(!op1.equals(op2)) {System.out.println("Error semantico, en este cociente los operadores deben ser del mismo tipo");} :}
+             | term:op1 POWER factor:op2   {: if(!op1.equals(op2)) {System.out.println("Error semantico, en esta potencia los operadores deben ser del mismo tipo");} :}  
+             | term:op1 MODULUS factor:op2   {: if(!op1.equals(op2)) {System.out.println("Error semantico, en este modulo los operadores deben ser del mismo tipo");} :};
 
-factor     ::= numbers
-             | MINUSW numbers
-             | STRING_LITERAL
-             | CHARSTR
-             | IDENTIFIER 
-             | IDENTIFIER DMINUS     
-             | IDENTIFIER DPLUS
-             | arrayElement
-             | paramList
-             | funcInvo
+factor     ::= numbers:numero {:RESULT = numero;:}
+             | MINUSW numbers:numero {:RESULT = numero;:}
+             | STRING_LITERAL {:RESULT = "STRING";:}
+             | CHARSTR {:RESULT = "CHAR";:}
+             | IDENTIFIER:ID {:String tipo = getTipo(ID.toString()); RESULT = tipo;:}
+             | IDENTIFIER:ID DMINUS {:String tipo = getTipo(ID.toString()); RESULT = tipo;:}    
+             | IDENTIFIER:ID DPLUS {:String tipo = getTipo(ID.toString()); RESULT = tipo;:}
+             | arrayElement:arrE {:RESULT = arrE;:}
+             | paramList:pLis {:RESULT = pLis;:}
+             | funcInvo:funI {:RESULT = funI;:}
              | MINUSW PARENTS compAritOp PARENTC
              | PARENTS compAritOp PARENTC;  
 
@@ -222,7 +271,8 @@ opLog ::= AND | OR;
 
 
 //Asignación de un valor a una variable
-varAsig      ::=  IDENTIFIER EQ exprP ENDEXPR       {:System.out.println("Se asigno VAR");:}
+varAsig      ::=  IDENTIFIER:ID EQ exprP ENDEXPR  {: boolean existe = existeVarNoT(ID.toString());
+                                                     if (!existe) {System.out.println("Esta variable -> " + ID.toString() + " <- no existe");}:}
              | EQ exprP ENDEXPR;
 
 
@@ -365,8 +415,8 @@ mainStruc    ::= mainInitial DELIMETERBLOCK BLOCK RETURN ENDEXPR DELIMETERBLOCK
 paramFunc    ::= exprP COMA paramFunc 
              | exprP;
 
-funcInvo     ::= IDENTIFIER PARENTS paramFunc PARENTC
-             | IDENTIFIER PARENTS PARENTC;
+funcInvo     ::= IDENTIFIER:ID PARENTS paramFunc PARENTC {: String tipo = getTipoFunc(ID.toString()); RESULT = tipo; :}
+             | IDENTIFIER:ID PARENTS PARENTC {: String tipo = getTipoFunc(ID.toString()); RESULT = tipo; :};
 
 
 
@@ -395,7 +445,7 @@ arrayInsAsign ::= arrayIns arrayAsig;
 
 arrayInsAsignGl ::= arrayInsGl arrayAsig;
 
-arrayElement ::= IDENTIFIER SQUARES INTEGER_LITERAL SQUAREC;
+arrayElement ::= IDENTIFIER:ID SQUARES INTEGER_LITERAL SQUAREC {: String tipo = getTipo(ID.toString()); RESULT = tipo; :};
 
 
 //Declaracion de switch
@@ -411,11 +461,11 @@ forStruc ::= FOR SEP IDENTIFIER SEP IN SEP RANGE PARENTS exprP COMA exprP PARENT
 
 
 //Declaracion de parametros
-paramStruc ::= PARAM SEP INT SEP IDENTIFIER:ID {: scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "INT"); :}
-      | PARAM SEP CHAR SEP IDENTIFIER:ID {: scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "CHAR"); :}
-      | PARAM SEP STRINGT SEP IDENTIFIER:ID {: scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "STRING"); :}
-      | PARAM SEP FLOAT SEP IDENTIFIER:ID {: scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "FLOAT"); :}
-      | PARAM SEP BOOL SEP IDENTIFIER:ID  {: scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "BOOL"); :}; 
+paramStruc ::= PARAM SEP INT SEP IDENTIFIER:ID {:String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "INT"); :}
+      | PARAM SEP CHAR SEP IDENTIFIER:ID {:String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "CHAR"); :}
+      | PARAM SEP STRINGT SEP IDENTIFIER:ID {:String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "STRING"); :}
+      | PARAM SEP FLOAT SEP IDENTIFIER:ID {:String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "FLOAT"); :}
+      | PARAM SEP BOOL SEP IDENTIFIER:ID  {:String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "BOOL"); :}; 
 
 paramList ::= paramStruc paramList
        | paramStruc;

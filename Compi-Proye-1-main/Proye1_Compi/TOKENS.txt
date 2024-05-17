@@ -70,6 +70,10 @@ Token: 23 int
 Token: 48 :
 Token: 2 ss
 Token: 72 ;
+Token: 2 ed
+Token: 37 =
+Token: 17 12
+Token: 72 ;
 Token: 65 return
 Token: 72 ;
 Token: 19 _

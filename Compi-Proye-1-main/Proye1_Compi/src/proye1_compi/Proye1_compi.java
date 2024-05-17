@@ -46,8 +46,8 @@ public class Proye1_compi {
         Files.move(Paths.get(symLocation), Paths.get(symd1), StandardCopyOption.REPLACE_EXISTING);
         Files.move(Paths.get(ParserLocation), Paths.get(pard1), StandardCopyOption.REPLACE_EXISTING);
 
-        String tokens = test1(currentDirectory + "\\src\\proye1_compi\\test.txt");
-        WriteToFile("TOKENS.txt", tokens);
+        //String tokens = test1(currentDirectory + "\\src\\proye1_compi\\test.txt");
+        //WriteToFile("TOKENS.txt", tokens);
         test2(currentDirectory + "\\src\\proye1_compi\\test.txt");
 
     }

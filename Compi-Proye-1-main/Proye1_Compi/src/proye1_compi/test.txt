@@ -3,17 +3,7 @@ glob:int:ss1;
 
 func:int:main_
 	loc:int:t1;
-	loc:int:t1;
+	t1 = 4*2.0;
         return;
 _
 
-func:int:xd_
-	loc:int:t1;
-	loc:int:ss;
-        return;
-_
-func:char:xd_
-	loc:int:t1;
-	loc:int:ss;
-        return;
-_
