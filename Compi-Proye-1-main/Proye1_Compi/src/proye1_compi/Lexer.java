@@ -1031,7 +1031,7 @@ class Lexer implements java_cup.runtime.Scanner {
           // fall through
           case 105: break;
           case 34:
-            { System.out.println("flotante"); return symbol(sym.FLOATNUM);
+            { return symbol(sym.FLOATNUM);
             }
           // fall through
           case 106: break;
@@ -1141,7 +1141,7 @@ class Lexer implements java_cup.runtime.Scanner {
           // fall through
           case 127: break;
           case 56:
-            { System.out.println("true"); return symbol(sym.TRUE);
+            { return symbol(sym.TRUE);
             }
           // fall through
           case 128: break;

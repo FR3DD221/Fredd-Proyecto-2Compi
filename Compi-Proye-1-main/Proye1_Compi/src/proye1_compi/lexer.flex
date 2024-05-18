@@ -63,8 +63,8 @@ minPls = ([+-])+
 
 <YYINITIAL> {dot}                { System.out.println("punto"); return symbol(sym.DOT, yytext()); }
 <YYINITIAL> {DecIntegerLiteral}  { return symbol(sym.INTEGER_LITERAL); }
-<YYINITIAL> {floatNum}           { System.out.println("flotante"); return symbol(sym.FLOATNUM); }
-<YYINITIAL> "true"               { System.out.println("true"); return symbol(sym.TRUE); }
+<YYINITIAL> {floatNum}           { return symbol(sym.FLOATNUM); }
+<YYINITIAL> "true"               { return symbol(sym.TRUE); }
 <YYINITIAL> "false"              { return symbol(sym.FALSE); }
 
 <YYINITIAL> "-"                  { return symbol(sym.MINUSW); }
