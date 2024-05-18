@@ -3,17 +3,10 @@ glob:int:ss1;
 glob:int:array:xd1[11];
 glob:int:array:xd1[11];
 
-func:int:main_
-	loc:int:t1;
-	ss = 2;
-        12.1 > 2.0;
-	loc:int:array:xd[12];
-        loc:int:array:xd[12];
-        loc:char:array:xd[12];
-        for:i:in:range(12,12)_print(i);_
-        loc:int:array:xd1[13]= [12, 12, '23'];
-        xd1 = [12, 12, '23'];
-        if(true && false)_print(pi6);_ 
-        return:2.1;
+func:int:xd_
+        loc:int:x22;
+        loc:int:var;
+        if(!(x22<=45)&&var>5 && "dfd") _ print(3);_
+        return:2;
 _
 

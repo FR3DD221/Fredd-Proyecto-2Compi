@@ -88,6 +88,16 @@ parser code {:
         return false;
     }
 
+    public boolean validarReturn(String tipo) {
+        ArrayList<String> ts = scopePrograma.get(currentHash);
+        
+        String[] elementos = ts.get(0).split(":");
+        String elemento = elementos[2];
+        if (!tipo.equals(elemento)) {return false;}
+
+        return true;
+    }
+
     public boolean existeFun(String ID, String tipo) {
         for (String key : scopePrograma.keySet()) {
             ArrayList<String> value = scopePrograma.get(key);
@@ -173,7 +183,7 @@ non terminal            expr_list;
 non terminal            Integer expr;// used to store evaluated subexpressions
 non terminal            SI, varIns, varAsig, BLOCK, compAritOp, factor, term, funcStruc, mainStruc, types, printStruc;
 non terminal            ifStruc, ifElseStruc, whileStruc, arrayIns, arrayAsig, arrayInsAsign, elementos, switchStruc, caseStruc, forStruc, numbers;
-non terminal            inputStruc, mainInitial, funInitial, exprP, exprLog, exprUni, opRel, opLog, arrayElement, paramStruc, paramList, paramFunc, funcInvo, GEN, arrayInsGl, varInsGl, varInsAsig, varInsAsigGl, arrayInsAsignGl;
+non terminal            returnStruc, inputStruc, mainInitial, funInitial, exprP, exprLog, exprUni, opRel, opLog, arrayElement, paramStruc, paramList, paramFunc, funcInvo, GEN, arrayInsGl, varInsGl, varInsAsig, varInsAsigGl, arrayInsAsignGl;
 
 /* Orden de precedencia */
 precedence left PLUS, MINUSW;
@@ -213,10 +223,9 @@ BLOCK ::= BLOCK exprP ENDEXPR
         | BLOCK arrayInsAsign
         | BLOCK printStruc ENDEXPR
         | BLOCK BREAK ENDEXPR
-        | BLOCK RETURN SEP exprP ENDEXPR
-        | BLOCK RETURN ENDEXPR
         | BLOCK inputStruc
         | BLOCK arrayAsig
+        | BLOCK returnStruc
         | exprP ENDEXPR
         | arrayIns ENDEXPR
         | arrayInsAsign
@@ -235,10 +244,9 @@ BLOCK ::= BLOCK exprP ENDEXPR
         | forStruc
         | arrayAsig
         | whileStruc
+        | returnStruc
         | printStruc ENDEXPR
         | BREAK ENDEXPR
-        | RETURN SEP exprP ENDEXPR
-        | RETURN ENDEXPR
         | inputStruc
         | error;
 
@@ -425,11 +433,7 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                         :};
 
 //Declaracion inicial del bloque para las funciones
-funcStruc    ::= 
-                funInitial:tipo DELIMETERBLOCK BLOCK RETURN SEP exprP:tipo2 ENDEXPR DELIMETERBLOCK {:
-                                                                                                    if (!tipo.equals(tipo2)) {System.out.println("ERROR SEMANTICO -> El tipo de la funcion no coincide con el retornado");} :}
-                | funInitial:tipo DELIMETERBLOCK RETURN SEP exprP:tipo2 ENDEXPR DELIMETERBLOCK {:
-                                                                                                    if (!tipo.equals(tipo2)) {System.out.println("ERROR SEMANTICO -> El tipo de la funcion no coincide con el retornado");} :};  
+funcStruc    ::= funInitial DELIMETERBLOCK BLOCK DELIMETERBLOCK;  
 
 mainInitial  ::= FUNC SEP INT SEP MAIN 
                         {:                              
@@ -442,10 +446,7 @@ mainInitial  ::= FUNC SEP INT SEP MAIN
                                                         scopePrograma.put(currentHash, fun);
                             :};
 
-mainStruc    ::= mainInitial DELIMETERBLOCK BLOCK RETURN SEP exprP:tipo ENDEXPR DELIMETERBLOCK {:
-                                                                                                    if (!tipo.equals("INT")) {System.out.println("ERROR SEMANTICO -> El main debe siempre retornar entero");} :}
-                | mainInitial DELIMETERBLOCK RETURN SEP exprP:tipo ENDEXPR DELIMETERBLOCK {:
-                                                                                                    if (!tipo.equals("INT")) {System.out.println("ERROR SEMANTICO -> El main debe siempre retornar entero");} :};
+mainStruc    ::= mainInitial DELIMETERBLOCK BLOCK DELIMETERBLOCK;
 
 paramFunc    ::= exprP COMA paramFunc 
                 | exprP;
@@ -540,6 +541,10 @@ printStruc ::= PRINT PARENTS numbers PARENTC
             | PRINT PARENTS IDENTIFIER PARENTC
             | PRINT PARENTS STRING_LITERAL PARENTC;
 
+
+returnStruc ::=  RETURN SEP exprP:val ENDEXPR {: boolean valido = validarReturn(val.toString()); 
+                                                if (!valido) {System.out.println("ERROR RETORNO -> Tipo de retorno distinto al de la funcion");}:}
+        | RETURN ENDEXPR;
 
 //Manejo de errores
 
