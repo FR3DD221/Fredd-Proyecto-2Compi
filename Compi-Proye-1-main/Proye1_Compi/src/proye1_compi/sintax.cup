@@ -135,6 +135,17 @@ parser code {:
         return false;
     }
 
+    public boolean todosIguales(ArrayList<String> lista) {
+        String primerElemento = lista.get(0);
+        for (int i = 1; i < lista.size(); i++) {
+            if (!lista.get(i).equals(primerElemento)) {
+                return false; 
+            }
+        }
+
+        return true; 
+    }
+
     public boolean existeArr(String ID, String tipo) {
         ArrayList<String> ts = scopePrograma.get(currentHash);
         String comparado = "Instancia LOC ARR: " + ID.toString() + ":" + tipo;
@@ -176,6 +187,7 @@ parser code {:
     Integer currentFloat = 0;
     Integer stackPointer = 0;
     Integer cantParams = 0;
+    ArrayList<String> elementosArray = new ArrayList<>();
 :}
 
 /* define how to connect to the scanner! */
@@ -278,48 +290,148 @@ numbers ::= INTEGER_LITERAL:lit {: RESULT = lit + ":" + "INT";:}
 compAritOp ::= term:op2 {:RESULT = op2;:}
              //| compAritOp MINPLS term  {: System.out.println("Se hizo MULTIPLESIMB"); :}
                 | compAritOp:op1 PLUS term:op2  {: 
-                                                
-                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en esta suma los operadores deben ser del mismo tipo");} else {RESULT = op1;}:}
+                                                String[] elementos1 = op1.toString().split(":");
+                                                String[] elementos2 = op2.toString().split(":");
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en esta suma los operadores deben ser del mismo tipo");} else 
+                                                {String baseTemp = "t";
+                                                    String miTempId;
+
+                                                    if (elementos1[1].equals("FLOAT")) {
+                                                        baseTemp = "f";
+                                                        currentFloat++;
+                                                        miTempId = baseTemp + currentFloat;}
+                                                    else {
+                                                        currentTemp++;
+                                                        miTempId = baseTemp + currentTemp;}
+                                                    
+                                                    cod3D.append("\n" + miTempId + "=" + elementos1[0] + "+" + elementos2[0]);
+
+                                                    RESULT = miTempId + ":" + elementos1[1];}:}
                 | compAritOp:op1 MINUSW term:op2  {: 
-                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en esta resta los operadores deben ser del mismo tipo");} else {RESULT = op1;}:};
+                                                String[] elementos1 = op1.toString().split(":");
+                                                String[] elementos2 = op2.toString().split(":");
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en esta resta los operadores deben ser del mismo tipo");} 
+                                                else {
+                                                    String baseTemp = "t";
+                                                    String miTempId;
+
+                                                    if (elementos1[1].equals("FLOAT")) {
+                                                        baseTemp = "f";
+                                                        currentFloat++;
+                                                        miTempId = baseTemp + currentFloat;}
+                                                    else {
+                                                        currentTemp++;
+                                                        miTempId = baseTemp + currentTemp;}
+                                                    
+                                                    cod3D.append("\n" + miTempId + "=" + elementos1[0] + "-" + elementos2[0]);
+
+                                                    RESULT = miTempId + ":" + elementos1[1];}:};
 
 term       ::= factor:op2 {:RESULT = op2;:}
                 | term:op1 PRODUCT factor:op2  {: 
-                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en este producto los operadores deben ser del mismo tipo");} else {RESULT = op1;}:}
+                                                String[] elementos1 = op1.toString().split(":");
+                                                String[] elementos2 = op2.toString().split(":");
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en este producto los operadores deben ser del mismo tipo");} else 
+                                                {String baseTemp = "t";
+                                                    String miTempId;
+
+                                                    if (elementos1[1].equals("FLOAT")) {
+                                                        baseTemp = "f";
+                                                        currentFloat++;
+                                                        miTempId = baseTemp + currentFloat;}
+                                                    else {
+                                                        currentTemp++;
+                                                        miTempId = baseTemp + currentTemp;}
+                                                    
+                                                    cod3D.append("\n" + miTempId + "=" + elementos1[0] + "*" + elementos2[0]);
+
+                                                    RESULT = miTempId + ":" + elementos1[1];}:}
                 | term:op1 DIVISION factor:op2  {: 
-                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en este cociente los operadores deben ser del mismo tipo");} else {RESULT = op1;}:}
+                                                String[] elementos1 = op1.toString().split(":");
+                                                String[] elementos2 = op2.toString().split(":");
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en este cociente los operadores deben ser del mismo tipo");} 
+                                                else {String baseTemp = "t";
+                                                    String miTempId;
+
+                                                    if (elementos1[1].equals("FLOAT")) {
+                                                        baseTemp = "f";
+                                                        currentFloat++;
+                                                        miTempId = baseTemp + currentFloat;}
+                                                    else {
+                                                        currentTemp++;
+                                                        miTempId = baseTemp + currentTemp;}
+                                                    
+                                                    cod3D.append("\n" + miTempId + "=" + elementos1[0] + "/" + elementos2[0]);
+
+                                                    RESULT = miTempId + ":" + elementos1[1];}:}
                 | term:op1 POWER factor:op2   {: 
-                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en esta potencia los operadores deben ser del mismo tipo");} else {RESULT = op1;}:}  
+                                                String[] elementos1 = op1.toString().split(":");
+                                                String[] elementos2 = op2.toString().split(":");
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en esta potencia los operadores deben ser del mismo tipo");} else 
+                                                {String baseTemp = "t";
+                                                    String miTempId;
+
+                                                    if (elementos1[1].equals("FLOAT")) {
+                                                        baseTemp = "f";
+                                                        currentFloat++;
+                                                        miTempId = baseTemp + currentFloat;}
+                                                    else {
+                                                        currentTemp++;
+                                                        miTempId = baseTemp + currentTemp;}
+                                                    
+                                                    cod3D.append("\n" + miTempId + "=" + elementos1[0] + "^" + elementos2[0]);
+
+                                                    RESULT = miTempId + ":" + elementos1[1];}:}  
                 | term:op1 MODULUS factor:op2   {: 
-                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en este modulo los operadores deben ser del mismo tipo");} else {RESULT = op1;}:};
+                                                String[] elementos1 = op1.toString().split(":");
+                                                String[] elementos2 = op2.toString().split(":");
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en este modulo los operadores deben ser del mismo tipo");} else 
+                                                {String baseTemp = "t";
+                                                    String miTempId;
+
+                                                    if (elementos1[1].equals("FLOAT")) {
+                                                        baseTemp = "f";
+                                                        currentFloat++;
+                                                        miTempId = baseTemp + currentFloat;}
+                                                    else {
+                                                        currentTemp++;
+                                                        miTempId = baseTemp + currentTemp;}
+                                                    
+                                                    cod3D.append("\n" + miTempId + "=" + elementos1[0] + "%" + elementos2[0]);
+
+                                                    RESULT = miTempId + ":" + elementos1[1];}:};
 
 factor     ::= numbers:numero {:
                 String[] elementos = numero.toString().split(":");
-                if (elementos[1].equals("FLOAT")) {                
-                    String miTempId = "f"+currentFloat++;
+                if (elementos[1].equals("FLOAT")) {   
+                    currentFloat++;             
+                    String miTempId = "f"+currentFloat;
                     cod3D.append("\n" +  miTempId + "=" + elementos[0]);}
-                else {                
-                    String miTempId = "t"+currentTemp++;
+                else {    
+                    currentTemp++;            
+                    String miTempId = "t"+currentTemp;
                     cod3D.append("\n" +  miTempId + "=" + elementos[0]);}
 
-                RESULT = elementos[1];:}
+                RESULT = numero;:}
 
                 | MINUSW numbers:numero {:RESULT = numero;:}
                 | STRING_LITERAL:lit {:
-                                String miTempId = "t"+currentTemp++;
+                                currentTemp++;
+                                String miTempId = "t"+currentTemp;
                                 cod3D.append("\n" +  miTempId + "=" + lit.toString());
-                                RESULT = "STRING";:}
+                                RESULT = miTempId.trim() + ":STRING";:}
 
                 | CHARSTR:lit {:
-                        String miTempId = "t"+currentTemp++;
+                        currentTemp++;
+                        String miTempId = "t"+currentTemp;
                         cod3D.append("\n" +  miTempId + "=" + lit.toString());
-                        RESULT = "CHAR";:}
+                        RESULT = miTempId.trim() + ":CHAR";:}
 
                 | IDENTIFIER:ID {:
                                 String tipo = getTipo(ID.toString()); 
                                 String baseTemp = "t";
                                 String miTempId;
-                                if (tipo.equals("float")) {
+                                if (tipo.equals("FLOAT")) {
                                     baseTemp = "f";
                                     currentFloat++;
                                     miTempId = baseTemp + currentFloat;}
@@ -329,12 +441,12 @@ factor     ::= numbers:numero {:
 
                                 cod3D.append("\n" + miTempId + "=" + ID.toString());
 
-                                RESULT = tipo + ":" + miTempId;:}
+                                RESULT = miTempId.trim() + ":" + tipo;:}
 
                 | IDENTIFIER:ID DMINUS {:String tipo = getTipo(ID.toString()); 
                                         String baseTemp = "t";
                                         String miTempId;
-                                        if (tipo.equals("float")) {
+                                        if (tipo.equals("FLOAT")) {
                                             baseTemp = "f";
                                             currentFloat++;
                                             miTempId = baseTemp + currentFloat;}
@@ -351,12 +463,12 @@ factor     ::= numbers:numero {:
                                         cod3D.append("\n" + miTemp2 + " = " + miTempId + "-" + miTemp1);
                                         cod3D.append("\n" + ID.toString() + " = " + miTemp2);
                                         
-                                        RESULT = tipo;:} 
+                                        RESULT = ID.toString().trim() + ":" + tipo;:} 
 
                 | IDENTIFIER:ID DPLUS {:String tipo = getTipo(ID.toString()); 
                                         String baseTemp = "t";
                                         String miTempId;
-                                        if (tipo.equals("float")) {
+                                        if (tipo.equals("FLOAT")) {
                                             baseTemp = "f";
                                             currentFloat++;
                                             miTempId = baseTemp + currentFloat;}
@@ -373,7 +485,7 @@ factor     ::= numbers:numero {:
                                         cod3D.append("\n" + miTemp2 + " = " + miTempId + "+" + miTemp1);
                                         cod3D.append("\n" + ID.toString() + " = " + miTemp2);
                                         
-                                        RESULT = tipo;:}
+                                        RESULT = ID.toString().trim() + ":" + tipo;:}
 
                 | arrayElement:arrE {:RESULT = arrE;:}
                 | paramList:pLis {:RESULT = pLis;:}
@@ -390,21 +502,81 @@ exprP ::= exprLog:expL {:RESULT = expL;:}
         | compAritOp:comp {:RESULT = comp;:}      
         | exprUni:expU {:RESULT = expU;:} ;
 
-exprLog ::= compAritOp:op1 opRel compAritOp:op2 {: if(!op1.equals(op2)) {System.out.println("Error, la comparacion debe ser entre valores del mismo tipo"); RESULT = "NULL";} else {RESULT = "BOOL";} :}
+exprLog ::= compAritOp:op1 opRel:op compAritOp:op2 {: 
+                                                    String[] elementos1 = op1.toString().split(":");
+                                                    String[] elementos2 = op2.toString().split(":");
+                                                    System.out.println(elementos2[1]);
+
+                                                    if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error, la comparacion debe ser entre valores del mismo tipo"); RESULT = elementos1[0] + ":" + "NULL";} else 
+                                                    {
+                                                    String baseTemp = "t";
+                                                    currentTemp++;
+                                                    String miTempId = baseTemp + currentTemp + " = " + elementos1[0];
+                                                    currentTemp++;
+                                                    cod3D.append("\n" + miTempId);
+                                                    String miTempId2 = baseTemp + currentTemp + " = " + elementos2[0];
+                                                    int x = currentTemp - 2;
+                                                    int y = x + 1;
+                                                    cod3D.append("\n" + miTempId2);
+                                                    currentTemp++;
+                                                    String miTempId3 = baseTemp + currentTemp + " = t" + y + op.toString() + "t" + x;
+                                                    cod3D.append("\n" + miTempId3);
+
+                                                    RESULT = baseTemp + currentTemp + ":" + "BOOL";} :}
         | PARENTS exprLog:op2 PARENTC {:RESULT = op2;:}
         | opRel exprLog:op2 {:RESULT = op2;:}
-        | TRUE {:RESULT = "BOOL";:} 
-        | FALSE {:RESULT = "BOOL";:};
+        | TRUE {:RESULT = "TRUE:BOOL";:} 
+        | FALSE {:RESULT = "FALSE:BOOL";:};
 
-exprUni ::= exprLog:op1 opLog exprP:op2  {: if(op1.equals("BOOL") && op2.equals("BOOL")) {RESULT = "BOOL";} else {System.out.println("Ambos operadores deben ser booleanos"); RESULT = "NULL";}:}
-        | IDENTIFIER:ID opLog exprP:op2  {: 
+exprUni ::= exprLog:op1 opLog:op exprP:op2  {: String[] elementos1 = op1.toString().split(":");
+                                            String[] elementos2 = op2.toString().split(":");
+                                            System.out.println(op2);
+                                            if(elementos1[1].equals("BOOL") && elementos2[1].equals("BOOL")) 
+                                            {
+                                                String baseTemp = "t";
+                                                currentTemp++;
+                                                String miTempId = baseTemp + currentTemp + " = " + elementos1[0];
+                                                currentTemp++;
+                                                cod3D.append("\n" + miTempId);
+                                                String miTempId2 = baseTemp + currentTemp + " = " + elementos2[0];
+                                                int x = currentTemp - 2;
+                                                int y = x + 1;
+                                                cod3D.append("\n" + miTempId2);
+                                                currentTemp++;
+                                                String miTempId3 = baseTemp + currentTemp + " = t" + y + op.toString() + "t" + x;
+                                                cod3D.append("\n" + miTempId3);
+
+                                                RESULT = baseTemp + currentTemp + ":" + "BOOL";} 
+
+                                            else {System.out.println("Ambos operadores deben ser booleanos"); RESULT = elementos1[0] + ":" + "NULL";}:}
+        | IDENTIFIER:ID opLog:op exprP:op2  {: 
                                             String tipo = getTipo(ID.toString());
-                                            if(tipo.equals("BOOL") && op2.equals("BOOL")) {RESULT = "BOOL";} else {System.out.println("Ambos operadores deben ser booleanos"); RESULT = "NULL";} :}
+                                            String[] elementos1 = op2.toString().split(":");
+                                            
+                                            if(tipo.equals("BOOL") && elementos1[1].equals("BOOL")) 
+                                            {
+                                                
+                                                String baseTemp = "t";
+                                                currentTemp++;
+                                                String miTempId = baseTemp + currentTemp + " = " + elementos1[0];
+                                                cod3D.append("\n" + miTempId);
+                                                currentTemp++;
+                                                String miTempId2 = baseTemp + currentTemp + " = " + ID.toString();
+                                                int x = currentTemp - 2;
+                                                int y = x + 1;
+                                                cod3D.append("\n" + miTempId2);
+                                                currentTemp++;
+                                                String miTempId3 = baseTemp + currentTemp + " = t" + y + op.toString() + "t" + x;
+
+                                                cod3D.append("\n" + miTempId3);
+
+                                                RESULT = baseTemp + currentTemp + ":" + "BOOL";} 
+                                            else {System.out.println("Ambos operadores deben ser booleanos"); RESULT = elementos1[0] + ":" + "NULL";} :}
         | PARENTS exprUni PARENTC;
 
-opRel ::= GRATHER | GRATHERT | LOWER | LOWERT | DIFF | COMPARATION | NEGATION;
-opLog ::= AND {:RESULT = "AND";:} 
-        | OR {:RESULT = "OR";:};
+opRel ::= GRATHER {:RESULT = ">";:} | GRATHERT {:RESULT = ">=";:}  | LOWER {:RESULT = "<";:}  | LOWERT {:RESULT = "<=";:}  | DIFF {:RESULT = "!=";:}  | COMPARATION {:RESULT = "==";:}  | NEGATION {:RESULT = "!";:} ;
+opLog ::= AND {:RESULT = "&&";:} 
+        | OR {:RESULT = "||";:};
 
 //Asignación de un valor a una variable
 varAsig      ::=  IDENTIFIER:ID EQ exprP:val ENDEXPR  {: 
@@ -412,7 +584,9 @@ varAsig      ::=  IDENTIFIER:ID EQ exprP:val ENDEXPR  {:
                                                     boolean existe = existeVar(ID.toString(), tipo);
                                                     boolean existe2 = existeVarGlob(ID.toString(), tipo);
                                                     if (!existe && !existe2) {System.out.println("Esta variable -> " + ID.toString() + " <- no existe");}
-                                                    if(!tipo.equals(val)) {System.out.println("Error semantico, el tipo de la variable no coincide con el asignado");} else {RESULT = tipo;}:}
+                                                    String[] valores = val.toString().split(":");
+                                                    
+                                                    if(!tipo.equals(valores[1])) {System.out.println("Error semantico, el tipo de la variable no coincide con el asignado");} else {RESULT = tipo;}:}
                 | EQ exprP:val ENDEXPR {:RESULT = val;:};
 
 
@@ -610,7 +784,8 @@ paramFunc    ::= exprP COMA paramFunc {: cantParams++; :}
                 | exprP {: cantParams++; :};
 
 funcInvo     ::= IDENTIFIER:ID PARENTS paramFunc PARENTC {: 
-                                                            cod3D.append("\ncall " + ID.toString() + ", " + cantParams);
+                                                            currentTemp++;
+                                                            cod3D.append("\nt" + currentTemp + "= call " + ID.toString() + ", " + cantParams);
                                                             cantParams = 0;
                                                             String tipo = getTipoFunc(ID.toString()); 
                                                             boolean existe = existeFun(ID.toString(), tipo);
@@ -618,7 +793,8 @@ funcInvo     ::= IDENTIFIER:ID PARENTS paramFunc PARENTC {:
                                                             RESULT = tipo; :}
 
                 | IDENTIFIER:ID PARENTS PARENTC {: String tipo = getTipoFunc(ID.toString()); 
-                                                            cod3D.append("\ncall " + ID.toString() + ", " + 0);
+                                                            currentTemp++;
+                                                            cod3D.append("\nt" + currentTemp + "= call " + ID.toString() + ", " + 0);
                                                             boolean existe = existeFun(ID.toString(), tipo);
                                                             if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");}
                                                             RESULT = tipo; :};
@@ -656,16 +832,21 @@ arrayInsGl ::=  GLOB SEP INT SEP ARRAY SEP IDENTIFIER:ID SQUARES INTEGER_LITERAL
                                                                                         RESULT = "INT";:};
 
 //Declaracion de ARRAYS Y TODO LO RELACIONADO
-arrayAsig ::= IDENTIFIER:ID EQ SQUARES elementos:elem SQUAREC ENDEXPR {:
+arrayAsig ::= IDENTIFIER:ID EQ SQUARES elementos SQUAREC ENDEXPR {:
                                                                         String tipo = getTipo(ID.toString());
                                                                         boolean existe = existeArr(ID.toString(), tipo);
                                                                         boolean existe2 = existeArrGlob(ID.toString(), tipo);
                                                                         if (!existe && !existe2) {System.out.println("Este array -> " + ID.toString() + " <- no existe");}
-                                                                        if (!tipo.equals(elem)) {System.out.println("Los elementos asignados deben coincidir en tipo entre ellos y de acuerdo al arreglo");}:}
+
+                                                                        if (!todosIguales(elementosArray)) {System.out.println("Los elementos asignados deben coincidir en tipo entre ellos y de acuerdo al arreglo");}
+                                                                        elementosArray.clear();:}
             | EQ SQUARES elementos:elem SQUAREC ENDEXPR {:RESULT = elem;:};
 
-elementos ::= compAritOp:val1 COMA elementos:val2 {: if(val1.equals(val2)) {RESULT = val1;} else {RESULT= "NULL";}:}
-            | compAritOp:val1 {: RESULT = val1; :};
+elementos ::= compAritOp:val1 COMA elementos:val2 {:String[] elementos1 = val1.toString().split(":");
+                                                    elementosArray.add(elementos1[1]);:}
+            | compAritOp:val1 {: 
+                                String[] elementos1 = val1.toString().split(":");
+                                elementosArray.add(elementos1[1]);; :};
 
 arrayInsAsign ::= arrayIns:t1 arrayAsig:t2 {:
                                             if (!t1.equals(t2)) {System.out.println("ERROR ARRAY LOC -> No todos los valores coinciden con el tipo instanciado");}:};
@@ -673,7 +854,9 @@ arrayInsAsign ::= arrayIns:t1 arrayAsig:t2 {:
 arrayInsAsignGl ::= arrayInsGl:t1 arrayAsig:t2 {:
                                             if (!t1.equals(t2)) {System.out.println("ERROR ARRAY GLOB -> No todos los valores coinciden con el tipo instanciado");}:};
 
-arrayElement ::= IDENTIFIER:ID SQUARES INTEGER_LITERAL SQUAREC {: String tipo = getTipo(ID.toString()); RESULT = tipo; :};
+arrayElement ::= IDENTIFIER:ID SQUARES INTEGER_LITERAL:lit SQUAREC {: currentTemp++;
+                                                                cod3D.append("\nt" + currentTemp + " = " + ID.toString() + ", " + lit);
+                                                                String tipo = getTipo(ID.toString()); RESULT = "t" + currentTemp + ":" + tipo; :};
 
 
 //Declaracion de switch

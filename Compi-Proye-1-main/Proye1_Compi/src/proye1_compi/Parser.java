@@ -1336,6 +1336,17 @@ return lex.next_token();
         return false;
     }
 
+    public boolean todosIguales(ArrayList<String> lista) {
+        String primerElemento = lista.get(0);
+        for (int i = 1; i < lista.size(); i++) {
+            if (!lista.get(i).equals(primerElemento)) {
+                return false; 
+            }
+        }
+
+        return true; 
+    }
+
     public boolean existeArr(String ID, String tipo) {
         ArrayList<String> ts = scopePrograma.get(currentHash);
         String comparado = "Instancia LOC ARR: " + ID.toString() + ":" + tipo;
@@ -1377,6 +1388,7 @@ return lex.next_token();
     Integer currentFloat = 0;
     Integer stackPointer = 0;
     Integer cantParams = 0;
+    ArrayList<String> elementosArray = new ArrayList<>();
 
 
 /** Cup generated class to encapsulate user supplied action code.*/
@@ -2015,8 +2027,23 @@ class CUP$Parser$actions {
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 
-                                                
-                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en esta suma los operadores deben ser del mismo tipo");} else {RESULT = op1;}
+                                                String[] elementos1 = op1.toString().split(":");
+                                                String[] elementos2 = op2.toString().split(":");
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en esta suma los operadores deben ser del mismo tipo");} else 
+                                                {String baseTemp = "t";
+                                                    String miTempId;
+
+                                                    if (elementos1[1].equals("FLOAT")) {
+                                                        baseTemp = "f";
+                                                        currentFloat++;
+                                                        miTempId = baseTemp + currentFloat;}
+                                                    else {
+                                                        currentTemp++;
+                                                        miTempId = baseTemp + currentTemp;}
+                                                    
+                                                    cod3D.append("\n" + miTempId + "=" + elementos1[0] + "+" + elementos2[0]);
+
+                                                    RESULT = miTempId + ":" + elementos1[1];}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("compAritOp",6, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2032,7 +2059,24 @@ class CUP$Parser$actions {
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 
-                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en esta resta los operadores deben ser del mismo tipo");} else {RESULT = op1;}
+                                                String[] elementos1 = op1.toString().split(":");
+                                                String[] elementos2 = op2.toString().split(":");
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en esta resta los operadores deben ser del mismo tipo");} 
+                                                else {
+                                                    String baseTemp = "t";
+                                                    String miTempId;
+
+                                                    if (elementos1[1].equals("FLOAT")) {
+                                                        baseTemp = "f";
+                                                        currentFloat++;
+                                                        miTempId = baseTemp + currentFloat;}
+                                                    else {
+                                                        currentTemp++;
+                                                        miTempId = baseTemp + currentTemp;}
+                                                    
+                                                    cod3D.append("\n" + miTempId + "=" + elementos1[0] + "-" + elementos2[0]);
+
+                                                    RESULT = miTempId + ":" + elementos1[1];}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("compAritOp",6, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2060,7 +2104,23 @@ class CUP$Parser$actions {
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 
-                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en este producto los operadores deben ser del mismo tipo");} else {RESULT = op1;}
+                                                String[] elementos1 = op1.toString().split(":");
+                                                String[] elementos2 = op2.toString().split(":");
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en este producto los operadores deben ser del mismo tipo");} else 
+                                                {String baseTemp = "t";
+                                                    String miTempId;
+
+                                                    if (elementos1[1].equals("FLOAT")) {
+                                                        baseTemp = "f";
+                                                        currentFloat++;
+                                                        miTempId = baseTemp + currentFloat;}
+                                                    else {
+                                                        currentTemp++;
+                                                        miTempId = baseTemp + currentTemp;}
+                                                    
+                                                    cod3D.append("\n" + miTempId + "=" + elementos1[0] + "*" + elementos2[0]);
+
+                                                    RESULT = miTempId + ":" + elementos1[1];}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("term",8, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2076,7 +2136,23 @@ class CUP$Parser$actions {
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 
-                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en este cociente los operadores deben ser del mismo tipo");} else {RESULT = op1;}
+                                                String[] elementos1 = op1.toString().split(":");
+                                                String[] elementos2 = op2.toString().split(":");
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en este cociente los operadores deben ser del mismo tipo");} 
+                                                else {String baseTemp = "t";
+                                                    String miTempId;
+
+                                                    if (elementos1[1].equals("FLOAT")) {
+                                                        baseTemp = "f";
+                                                        currentFloat++;
+                                                        miTempId = baseTemp + currentFloat;}
+                                                    else {
+                                                        currentTemp++;
+                                                        miTempId = baseTemp + currentTemp;}
+                                                    
+                                                    cod3D.append("\n" + miTempId + "=" + elementos1[0] + "/" + elementos2[0]);
+
+                                                    RESULT = miTempId + ":" + elementos1[1];}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("term",8, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2092,7 +2168,23 @@ class CUP$Parser$actions {
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 
-                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en esta potencia los operadores deben ser del mismo tipo");} else {RESULT = op1;}
+                                                String[] elementos1 = op1.toString().split(":");
+                                                String[] elementos2 = op2.toString().split(":");
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en esta potencia los operadores deben ser del mismo tipo");} else 
+                                                {String baseTemp = "t";
+                                                    String miTempId;
+
+                                                    if (elementos1[1].equals("FLOAT")) {
+                                                        baseTemp = "f";
+                                                        currentFloat++;
+                                                        miTempId = baseTemp + currentFloat;}
+                                                    else {
+                                                        currentTemp++;
+                                                        miTempId = baseTemp + currentTemp;}
+                                                    
+                                                    cod3D.append("\n" + miTempId + "=" + elementos1[0] + "^" + elementos2[0]);
+
+                                                    RESULT = miTempId + ":" + elementos1[1];}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("term",8, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2108,7 +2200,23 @@ class CUP$Parser$actions {
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 
-                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en este modulo los operadores deben ser del mismo tipo");} else {RESULT = op1;}
+                                                String[] elementos1 = op1.toString().split(":");
+                                                String[] elementos2 = op2.toString().split(":");
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en este modulo los operadores deben ser del mismo tipo");} else 
+                                                {String baseTemp = "t";
+                                                    String miTempId;
+
+                                                    if (elementos1[1].equals("FLOAT")) {
+                                                        baseTemp = "f";
+                                                        currentFloat++;
+                                                        miTempId = baseTemp + currentFloat;}
+                                                    else {
+                                                        currentTemp++;
+                                                        miTempId = baseTemp + currentTemp;}
+                                                    
+                                                    cod3D.append("\n" + miTempId + "=" + elementos1[0] + "%" + elementos2[0]);
+
+                                                    RESULT = miTempId + ":" + elementos1[1];}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("term",8, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2122,14 +2230,16 @@ class CUP$Parser$actions {
 		Object numero = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
                 String[] elementos = numero.toString().split(":");
-                if (elementos[1].equals("FLOAT")) {                
-                    String miTempId = "f"+currentFloat++;
+                if (elementos[1].equals("FLOAT")) {   
+                    currentFloat++;             
+                    String miTempId = "f"+currentFloat;
                     cod3D.append("\n" +  miTempId + "=" + elementos[0]);}
-                else {                
-                    String miTempId = "t"+currentTemp++;
+                else {    
+                    currentTemp++;            
+                    String miTempId = "t"+currentTemp;
                     cod3D.append("\n" +  miTempId + "=" + elementos[0]);}
 
-                RESULT = elementos[1];
+                RESULT = numero;
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2154,9 +2264,10 @@ class CUP$Parser$actions {
 		int litright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object lit = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
-                                String miTempId = "t"+currentTemp++;
+                                currentTemp++;
+                                String miTempId = "t"+currentTemp;
                                 cod3D.append("\n" +  miTempId + "=" + lit.toString());
-                                RESULT = "STRING";
+                                RESULT = miTempId.trim() + ":STRING";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2169,9 +2280,10 @@ class CUP$Parser$actions {
 		int litright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object lit = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
-                        String miTempId = "t"+currentTemp++;
+                        currentTemp++;
+                        String miTempId = "t"+currentTemp;
                         cod3D.append("\n" +  miTempId + "=" + lit.toString());
-                        RESULT = "CHAR";
+                        RESULT = miTempId.trim() + ":CHAR";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2187,7 +2299,7 @@ class CUP$Parser$actions {
                                 String tipo = getTipo(ID.toString()); 
                                 String baseTemp = "t";
                                 String miTempId;
-                                if (tipo.equals("float")) {
+                                if (tipo.equals("FLOAT")) {
                                     baseTemp = "f";
                                     currentFloat++;
                                     miTempId = baseTemp + currentFloat;}
@@ -2197,7 +2309,7 @@ class CUP$Parser$actions {
 
                                 cod3D.append("\n" + miTempId + "=" + ID.toString());
 
-                                RESULT = tipo + ":" + miTempId;
+                                RESULT = miTempId.trim() + ":" + tipo;
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2212,7 +2324,7 @@ class CUP$Parser$actions {
 		String tipo = getTipo(ID.toString()); 
                                         String baseTemp = "t";
                                         String miTempId;
-                                        if (tipo.equals("float")) {
+                                        if (tipo.equals("FLOAT")) {
                                             baseTemp = "f";
                                             currentFloat++;
                                             miTempId = baseTemp + currentFloat;}
@@ -2229,7 +2341,7 @@ class CUP$Parser$actions {
                                         cod3D.append("\n" + miTemp2 + " = " + miTempId + "-" + miTemp1);
                                         cod3D.append("\n" + ID.toString() + " = " + miTemp2);
                                         
-                                        RESULT = tipo;
+                                        RESULT = ID.toString().trim() + ":" + tipo;
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2244,7 +2356,7 @@ class CUP$Parser$actions {
 		String tipo = getTipo(ID.toString()); 
                                         String baseTemp = "t";
                                         String miTempId;
-                                        if (tipo.equals("float")) {
+                                        if (tipo.equals("FLOAT")) {
                                             baseTemp = "f";
                                             currentFloat++;
                                             miTempId = baseTemp + currentFloat;}
@@ -2261,7 +2373,7 @@ class CUP$Parser$actions {
                                         cod3D.append("\n" + miTemp2 + " = " + miTempId + "+" + miTemp1);
                                         cod3D.append("\n" + ID.toString() + " = " + miTemp2);
                                         
-                                        RESULT = tipo;
+                                        RESULT = ID.toString().trim() + ":" + tipo;
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2378,10 +2490,33 @@ class CUP$Parser$actions {
 		int op1left = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).left;
 		int op1right = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
 		Object op1 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
+		int opleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
+		int opright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
+		Object op = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
 		int op2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 if(!op1.equals(op2)) {System.out.println("Error, la comparacion debe ser entre valores del mismo tipo"); RESULT = "NULL";} else {RESULT = "BOOL";} 
+		 
+                                                    String[] elementos1 = op1.toString().split(":");
+                                                    String[] elementos2 = op2.toString().split(":");
+                                                    System.out.println(elementos2[1]);
+
+                                                    if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error, la comparacion debe ser entre valores del mismo tipo"); RESULT = elementos1[0] + ":" + "NULL";} else 
+                                                    {
+                                                    String baseTemp = "t";
+                                                    currentTemp++;
+                                                    String miTempId = baseTemp + currentTemp + " = " + elementos1[0];
+                                                    currentTemp++;
+                                                    cod3D.append("\n" + miTempId);
+                                                    String miTempId2 = baseTemp + currentTemp + " = " + elementos2[0];
+                                                    int x = currentTemp - 2;
+                                                    int y = x + 1;
+                                                    cod3D.append("\n" + miTempId2);
+                                                    currentTemp++;
+                                                    String miTempId3 = baseTemp + currentTemp + " = t" + y + op.toString() + "t" + x;
+                                                    cod3D.append("\n" + miTempId3);
+
+                                                    RESULT = baseTemp + currentTemp + ":" + "BOOL";} 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("exprLog",29, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2414,7 +2549,7 @@ class CUP$Parser$actions {
           case 91: // exprLog ::= TRUE 
             {
               Object RESULT =null;
-		RESULT = "BOOL";
+		RESULT = "TRUE:BOOL";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("exprLog",29, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2423,7 +2558,7 @@ class CUP$Parser$actions {
           case 92: // exprLog ::= FALSE 
             {
               Object RESULT =null;
-		RESULT = "BOOL";
+		RESULT = "FALSE:BOOL";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("exprLog",29, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2435,10 +2570,33 @@ class CUP$Parser$actions {
 		int op1left = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).left;
 		int op1right = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
 		Object op1 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
+		int opleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
+		int opright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
+		Object op = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
 		int op2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 if(op1.equals("BOOL") && op2.equals("BOOL")) {RESULT = "BOOL";} else {System.out.println("Ambos operadores deben ser booleanos"); RESULT = "NULL";}
+		 String[] elementos1 = op1.toString().split(":");
+                                            String[] elementos2 = op2.toString().split(":");
+                                            System.out.println(op2);
+                                            if(elementos1[1].equals("BOOL") && elementos2[1].equals("BOOL")) 
+                                            {
+                                                String baseTemp = "t";
+                                                currentTemp++;
+                                                String miTempId = baseTemp + currentTemp + " = " + elementos1[0];
+                                                currentTemp++;
+                                                cod3D.append("\n" + miTempId);
+                                                String miTempId2 = baseTemp + currentTemp + " = " + elementos2[0];
+                                                int x = currentTemp - 2;
+                                                int y = x + 1;
+                                                cod3D.append("\n" + miTempId2);
+                                                currentTemp++;
+                                                String miTempId3 = baseTemp + currentTemp + " = t" + y + op.toString() + "t" + x;
+                                                cod3D.append("\n" + miTempId3);
+
+                                                RESULT = baseTemp + currentTemp + ":" + "BOOL";} 
+
+                                            else {System.out.println("Ambos operadores deben ser booleanos"); RESULT = elementos1[0] + ":" + "NULL";}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("exprUni",30, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2450,12 +2608,35 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
+		int opleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
+		int opright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
+		Object op = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
 		int op2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 
                                             String tipo = getTipo(ID.toString());
-                                            if(tipo.equals("BOOL") && op2.equals("BOOL")) {RESULT = "BOOL";} else {System.out.println("Ambos operadores deben ser booleanos"); RESULT = "NULL";} 
+                                            String[] elementos1 = op2.toString().split(":");
+                                            
+                                            if(tipo.equals("BOOL") && elementos1[1].equals("BOOL")) 
+                                            {
+                                                
+                                                String baseTemp = "t";
+                                                currentTemp++;
+                                                String miTempId = baseTemp + currentTemp + " = " + elementos1[0];
+                                                cod3D.append("\n" + miTempId);
+                                                currentTemp++;
+                                                String miTempId2 = baseTemp + currentTemp + " = " + ID.toString();
+                                                int x = currentTemp - 2;
+                                                int y = x + 1;
+                                                cod3D.append("\n" + miTempId2);
+                                                currentTemp++;
+                                                String miTempId3 = baseTemp + currentTemp + " = t" + y + op.toString() + "t" + x;
+
+                                                cod3D.append("\n" + miTempId3);
+
+                                                RESULT = baseTemp + currentTemp + ":" + "BOOL";} 
+                                            else {System.out.println("Ambos operadores deben ser booleanos"); RESULT = elementos1[0] + ":" + "NULL";} 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("exprUni",30, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2473,7 +2654,7 @@ class CUP$Parser$actions {
           case 96: // opRel ::= GRATHER 
             {
               Object RESULT =null;
-
+		RESULT = ">";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("opRel",31, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2482,7 +2663,7 @@ class CUP$Parser$actions {
           case 97: // opRel ::= GRATHERT 
             {
               Object RESULT =null;
-
+		RESULT = ">=";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("opRel",31, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2491,7 +2672,7 @@ class CUP$Parser$actions {
           case 98: // opRel ::= LOWER 
             {
               Object RESULT =null;
-
+		RESULT = "<";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("opRel",31, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2500,7 +2681,7 @@ class CUP$Parser$actions {
           case 99: // opRel ::= LOWERT 
             {
               Object RESULT =null;
-
+		RESULT = "<=";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("opRel",31, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2509,7 +2690,7 @@ class CUP$Parser$actions {
           case 100: // opRel ::= DIFF 
             {
               Object RESULT =null;
-
+		RESULT = "!=";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("opRel",31, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2518,7 +2699,7 @@ class CUP$Parser$actions {
           case 101: // opRel ::= COMPARATION 
             {
               Object RESULT =null;
-
+		RESULT = "==";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("opRel",31, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2527,7 +2708,7 @@ class CUP$Parser$actions {
           case 102: // opRel ::= NEGATION 
             {
               Object RESULT =null;
-
+		RESULT = "!";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("opRel",31, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2536,7 +2717,7 @@ class CUP$Parser$actions {
           case 103: // opLog ::= AND 
             {
               Object RESULT =null;
-		RESULT = "AND";
+		RESULT = "&&";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("opLog",32, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2545,7 +2726,7 @@ class CUP$Parser$actions {
           case 104: // opLog ::= OR 
             {
               Object RESULT =null;
-		RESULT = "OR";
+		RESULT = "||";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("opLog",32, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2565,7 +2746,9 @@ class CUP$Parser$actions {
                                                     boolean existe = existeVar(ID.toString(), tipo);
                                                     boolean existe2 = existeVarGlob(ID.toString(), tipo);
                                                     if (!existe && !existe2) {System.out.println("Esta variable -> " + ID.toString() + " <- no existe");}
-                                                    if(!tipo.equals(val)) {System.out.println("Error semantico, el tipo de la variable no coincide con el asignado");} else {RESULT = tipo;}
+                                                    String[] valores = val.toString().split(":");
+                                                    
+                                                    if(!tipo.equals(valores[1])) {System.out.println("Error semantico, el tipo de la variable no coincide con el asignado");} else {RESULT = tipo;}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varAsig",4, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2998,7 +3181,8 @@ class CUP$Parser$actions {
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
 		 
-                                                            cod3D.append("\ncall " + ID.toString() + ", " + cantParams);
+                                                            currentTemp++;
+                                                            cod3D.append("\nt" + currentTemp + "= call " + ID.toString() + ", " + cantParams);
                                                             cantParams = 0;
                                                             String tipo = getTipoFunc(ID.toString()); 
                                                             boolean existe = existeFun(ID.toString(), tipo);
@@ -3016,7 +3200,8 @@ class CUP$Parser$actions {
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
 		 String tipo = getTipoFunc(ID.toString()); 
-                                                            cod3D.append("\ncall " + ID.toString() + ", " + 0);
+                                                            currentTemp++;
+                                                            cod3D.append("\nt" + currentTemp + "= call " + ID.toString() + ", " + 0);
                                                             boolean existe = existeFun(ID.toString(), tipo);
                                                             if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");}
                                                             RESULT = tipo; 
@@ -3122,15 +3307,14 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-5)).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-5)).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-5)).value;
-		int elemleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).left;
-		int elemright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
-		Object elem = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
 		
                                                                         String tipo = getTipo(ID.toString());
                                                                         boolean existe = existeArr(ID.toString(), tipo);
                                                                         boolean existe2 = existeArrGlob(ID.toString(), tipo);
                                                                         if (!existe && !existe2) {System.out.println("Este array -> " + ID.toString() + " <- no existe");}
-                                                                        if (!tipo.equals(elem)) {System.out.println("Los elementos asignados deben coincidir en tipo entre ellos y de acuerdo al arreglo");}
+
+                                                                        if (!todosIguales(elementosArray)) {System.out.println("Los elementos asignados deben coincidir en tipo entre ellos y de acuerdo al arreglo");}
+                                                                        elementosArray.clear();
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("arrayAsig",17, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-5)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -3157,7 +3341,8 @@ class CUP$Parser$actions {
 		int val2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int val2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object val2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 if(val1.equals(val2)) {RESULT = val1;} else {RESULT= "NULL";}
+		String[] elementos1 = val1.toString().split(":");
+                                                    elementosArray.add(elementos1[1]);
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("elementos",19, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -3169,7 +3354,9 @@ class CUP$Parser$actions {
 		int val1left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int val1right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object val1 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 RESULT = val1; 
+		 
+                                String[] elementos1 = val1.toString().split(":");
+                                elementosArray.add(elementos1[1]);; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("elementos",19, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -3213,7 +3400,12 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
-		 String tipo = getTipo(ID.toString()); RESULT = tipo; 
+		int litleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
+		int litright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
+		Object lit = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
+		 currentTemp++;
+                                                                cod3D.append("\nt" + currentTemp + " = " + ID.toString() + ", " + lit);
+                                                                String tipo = getTipo(ID.toString()); RESULT = "t" + currentTemp + ":" + tipo; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("arrayElement",33, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;

@@ -7,10 +7,12 @@ func:int:xd_
         loc:int:x22;
         param:int:xddd;
         loc:int:var;
-        var = "Ss";
-        return:2;
+        var = 2;
+        return:false||true;
         var--;
         xd(xd, 12);
         xd();
+        xd1[12];
+        xd1= [12, var, 23];
 _
 
