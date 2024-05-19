@@ -147,6 +147,19 @@ parser code {:
         return false;
     }
 
+    public int countParam (String nombreFunc) {
+        ArrayList<String> currentFunc = scopePrograma.get(nombreFunc);
+        int cantParam = 0;
+
+        for (String elem : currentFunc) {
+            String[] expresion = elem.split(":");
+            String lexema = expresion[0].trim();
+            
+            
+            if(lexema.equals("Instancia PARAM") ){ cantParam++;}
+        }
+        return cantParam;
+    }
 
     //recuperacion de errores de sintaxis
     public void syntax_error(Symbol s) {
@@ -157,6 +170,12 @@ parser code {:
     public void unrecovered_syntax_error(Symbol s) {
         System.out.println("!!Error fatal en : " +  s.value + " linea: " +  (s.left+1) +  " columna: " +  (s.right+1));
     } 
+
+    StringBuffer cod3D = new StringBuffer();
+    Integer currentTemp = 0;
+    Integer currentFloat = 0;
+    Integer stackPointer = 0;
+    Integer cantParams = 0;
 :}
 
 /* define how to connect to the scanner! */
@@ -195,7 +214,7 @@ precedence left DIVISION;
 start with SI;
 
 SI ::= {: scopePrograma.put(globalHash, new ArrayList<String>()); :} 
-    GEN; //{: imprimirscopePrograma(); :}
+    GEN {: System.out.println(cod3D.toString()); :};//{: imprimirscopePrograma(); :}
 
 GEN ::= funcStruc GEN | mainStruc GEN | arrayInsGl ENDEXPR GEN | varInsGl ENDEXPR GEN | varInsAsigGl 
     | varInsAsigGl GEN | funcStruc | mainStruc | arrayInsGl ENDEXPR | varInsGl ENDEXPR | error | error GEN
@@ -251,34 +270,116 @@ BLOCK ::= BLOCK exprP ENDEXPR
         | error;
 
 
-numbers ::= INTEGER_LITERAL {:RESULT = "INT";:}
-        | FLOATNUM {:RESULT = "FLOAT";:};
+numbers ::= INTEGER_LITERAL:lit {: RESULT = lit + ":" + "INT";:}
+        | FLOATNUM:lit {:RESULT = lit + ":" + "FLOAT";:};
 
 //Operaciones aritmeticas simples entre dos numeros
 /* Reglas de producción para operaciones aritméticas */
 compAritOp ::= term:op2 {:RESULT = op2;:}
              //| compAritOp MINPLS term  {: System.out.println("Se hizo MULTIPLESIMB"); :}
-                | compAritOp:op1 PLUS term:op2  {: if(!op1.equals(op2)) {System.out.println("Error semantico, en esta suma los operadores deben ser del mismo tipo");} else {RESULT = op1;}:}
-                | compAritOp:op1 MINUSW term:op2  {: if(!op1.equals(op2)) {System.out.println("Error semantico, en esta resta los operadores deben ser del mismo tipo");} else {RESULT = op1;}:};
+                | compAritOp:op1 PLUS term:op2  {: 
+                                                
+                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en esta suma los operadores deben ser del mismo tipo");} else {RESULT = op1;}:}
+                | compAritOp:op1 MINUSW term:op2  {: 
+                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en esta resta los operadores deben ser del mismo tipo");} else {RESULT = op1;}:};
 
 term       ::= factor:op2 {:RESULT = op2;:}
-                | term:op1 PRODUCT factor:op2  {: if(!op1.equals(op2)) {System.out.println("Error semantico, en este producto los operadores deben ser del mismo tipo");} else {RESULT = op1;}:}
-                | term:op1 DIVISION factor:op2  {: if(!op1.equals(op2)) {System.out.println("Error semantico, en este cociente los operadores deben ser del mismo tipo");} else {RESULT = op1;}:}
-                | term:op1 POWER factor:op2   {: if(!op1.equals(op2)) {System.out.println("Error semantico, en esta potencia los operadores deben ser del mismo tipo");} else {RESULT = op1;}:}  
-                | term:op1 MODULUS factor:op2   {: if(!op1.equals(op2)) {System.out.println("Error semantico, en este modulo los operadores deben ser del mismo tipo");} else {RESULT = op1;}:};
+                | term:op1 PRODUCT factor:op2  {: 
+                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en este producto los operadores deben ser del mismo tipo");} else {RESULT = op1;}:}
+                | term:op1 DIVISION factor:op2  {: 
+                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en este cociente los operadores deben ser del mismo tipo");} else {RESULT = op1;}:}
+                | term:op1 POWER factor:op2   {: 
+                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en esta potencia los operadores deben ser del mismo tipo");} else {RESULT = op1;}:}  
+                | term:op1 MODULUS factor:op2   {: 
+                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en este modulo los operadores deben ser del mismo tipo");} else {RESULT = op1;}:};
 
-factor     ::= numbers:numero {:RESULT = numero;:}
+factor     ::= numbers:numero {:
+                String[] elementos = numero.toString().split(":");
+                if (elementos[1].equals("FLOAT")) {                
+                    String miTempId = "f"+currentFloat++;
+                    cod3D.append("\n" +  miTempId + "=" + elementos[0]);}
+                else {                
+                    String miTempId = "t"+currentTemp++;
+                    cod3D.append("\n" +  miTempId + "=" + elementos[0]);}
+
+                RESULT = elementos[1];:}
+
                 | MINUSW numbers:numero {:RESULT = numero;:}
-                | STRING_LITERAL {:RESULT = "STRING";:}
-                | CHARSTR {:RESULT = "CHAR";:}
-                | IDENTIFIER:ID {:String tipo = getTipo(ID.toString()); RESULT = tipo;:}
-                | IDENTIFIER:ID DMINUS {:String tipo = getTipo(ID.toString()); RESULT = tipo;:}    
-                | IDENTIFIER:ID DPLUS {:String tipo = getTipo(ID.toString()); RESULT = tipo;:}
+                | STRING_LITERAL:lit {:
+                                String miTempId = "t"+currentTemp++;
+                                cod3D.append("\n" +  miTempId + "=" + lit.toString());
+                                RESULT = "STRING";:}
+
+                | CHARSTR:lit {:
+                        String miTempId = "t"+currentTemp++;
+                        cod3D.append("\n" +  miTempId + "=" + lit.toString());
+                        RESULT = "CHAR";:}
+
+                | IDENTIFIER:ID {:
+                                String tipo = getTipo(ID.toString()); 
+                                String baseTemp = "t";
+                                String miTempId;
+                                if (tipo.equals("float")) {
+                                    baseTemp = "f";
+                                    currentFloat++;
+                                    miTempId = baseTemp + currentFloat;}
+                                else {
+                                    currentTemp++;
+                                    miTempId = baseTemp + currentTemp;}
+
+                                cod3D.append("\n" + miTempId + "=" + ID.toString());
+
+                                RESULT = tipo + ":" + miTempId;:}
+
+                | IDENTIFIER:ID DMINUS {:String tipo = getTipo(ID.toString()); 
+                                        String baseTemp = "t";
+                                        String miTempId;
+                                        if (tipo.equals("float")) {
+                                            baseTemp = "f";
+                                            currentFloat++;
+                                            miTempId = baseTemp + currentFloat;}
+                                        else {
+                                            currentTemp++;
+                                            miTempId = baseTemp + currentTemp;}
+                                        cod3D.append("\n" + miTempId + "=" + ID.toString());
+                                        currentTemp++;
+                                        String miTemp1 = baseTemp + currentTemp;
+                                        currentTemp++;
+                                        String miTemp2 = baseTemp + currentTemp;
+
+                                        cod3D.append("\n" + miTemp1 + " = 1");
+                                        cod3D.append("\n" + miTemp2 + " = " + miTempId + "-" + miTemp1);
+                                        cod3D.append("\n" + ID.toString() + " = " + miTemp2);
+                                        
+                                        RESULT = tipo;:} 
+
+                | IDENTIFIER:ID DPLUS {:String tipo = getTipo(ID.toString()); 
+                                        String baseTemp = "t";
+                                        String miTempId;
+                                        if (tipo.equals("float")) {
+                                            baseTemp = "f";
+                                            currentFloat++;
+                                            miTempId = baseTemp + currentFloat;}
+                                        else {
+                                            currentTemp++;
+                                            miTempId = baseTemp + currentTemp;}
+                                        cod3D.append("\n" + miTempId + "=" + ID.toString());
+                                        currentTemp++;
+                                        String miTemp1 = baseTemp + currentTemp;
+                                        currentTemp++;
+                                        String miTemp2 = baseTemp + currentTemp;
+
+                                        cod3D.append("\n" + miTemp1 + " = 1");
+                                        cod3D.append("\n" + miTemp2 + " = " + miTempId + "+" + miTemp1);
+                                        cod3D.append("\n" + ID.toString() + " = " + miTemp2);
+                                        
+                                        RESULT = tipo;:}
+
                 | arrayElement:arrE {:RESULT = arrE;:}
                 | paramList:pLis {:RESULT = pLis;:}
                 | funcInvo:funI {:RESULT = funI;:}
-                | MINUSW PARENTS compAritOp PARENTC
-                | PARENTS compAritOp PARENTC;  
+                | MINUSW PARENTS compAritOp:comp PARENTC {:RESULT = comp;:}
+                | PARENTS compAritOp:comp PARENTC {:RESULT = comp;:};  
 
 
 inputStruc ::= INPUT PARENTS IDENTIFIER PARENTC ENDEXPR;
@@ -305,9 +406,6 @@ opRel ::= GRATHER | GRATHERT | LOWER | LOWERT | DIFF | COMPARATION | NEGATION;
 opLog ::= AND {:RESULT = "AND";:} 
         | OR {:RESULT = "OR";:};
 
-
-
-
 //Asignación de un valor a una variable
 varAsig      ::=  IDENTIFIER:ID EQ exprP:val ENDEXPR  {: 
                                                     String tipo = getTipo(ID.toString());
@@ -322,27 +420,42 @@ varAsig      ::=  IDENTIFIER:ID EQ exprP:val ENDEXPR  {:
 varIns       ::= LOC SEP INT SEP IDENTIFIER:ID    {:
                                                     boolean existe = existeVar(ID.toString(), "INT");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
-                                                    scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "INT");   
+                                                    scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "INT");  
+
+                                                    cod3D.append("\nlocal_data_int " + ID.toString());
+
                                                     RESULT = "INT";:}
                 | LOC SEP CHAR SEP IDENTIFIER:ID     {: 
                                                     boolean existe = existeVar(ID.toString(), "CHAR");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
                                                     scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "CHAR");  
+
+                                                    cod3D.append("\nlocal_data_char " + ID.toString());
+
                                                     RESULT = "CHAR";:}   
                 | LOC SEP FLOAT SEP IDENTIFIER:ID    {: 
                                                     boolean existe = existeVar(ID.toString(), "FLOAT");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");} 
                                                     scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "FLOAT");  
+
+                                                    cod3D.append("\nlocal_data_float " + ID.toString());
+
                                                     RESULT = "FLOAT";:}
                 | LOC SEP BOOL SEP IDENTIFIER:ID     {: 
                                                     boolean existe = existeVar(ID.toString(), "BOOL");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
                                                     scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "BOOL");  
+
+                                                    cod3D.append("\nlocal_data_bool " + ID.toString());
+
                                                     RESULT = "BOOL";:}  
                 | LOC SEP STRINGT SEP IDENTIFIER:ID  {: 
                                                     boolean existe = existeVar(ID.toString(), "STRING");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");} 
                                                     scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "STRING"); 
+
+                                                    cod3D.append("\nlocal_data_string " + ID.toString());
+
                                                     RESULT = "STRING";:};
 
 
@@ -351,26 +464,41 @@ varInsGl     ::=  GLOB SEP INT SEP IDENTIFIER:ID     {:
                                                         boolean existe = existeVarGlob(ID.toString(), "INT");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
                                                         scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "INT"); 
+
+                                                        cod3D.append("\nglobal_data_int " + ID.toString());
+
                                                         RESULT = "INT";:}
                 | GLOB SEP CHAR SEP IDENTIFIER:ID       {:          
                                                         boolean existe = existeVarGlob(ID.toString(), "CHAR");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");} 
-                                                        scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "CHAR"); 
+                                                        scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "CHAR");
+
+                                                        cod3D.append("\nglobal_data_char " + ID.toString());
+
                                                         RESULT = "CHAR";:}
                 | GLOB SEP FLOAT SEP IDENTIFIER:ID      {:
                                                         boolean existe = existeVarGlob(ID.toString(), "FLOAT");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
                                                         scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "FLOAT"); 
+
+                                                        cod3D.append("\nglobal_data_float " + ID.toString());
+
                                                         RESULT = "FLOAT";:}
                 | GLOB SEP STRINGT SEP IDENTIFIER:ID    {:
                                                         boolean existe = existeVarGlob(ID.toString(), "STRING");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
                                                         scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "STRING"); 
+
+                                                        cod3D.append("\nglobal_data_string " + ID.toString());
+
                                                         RESULT = "STRING";:}
                 | GLOB SEP BOOL SEP IDENTIFIER:ID       {: 
                                                         boolean existe = existeVarGlob(ID.toString(), "BOOL");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
                                                         scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "BOOL"); 
+
+                                                        cod3D.append("\nglobal_data_bool " + ID.toString());
+
                                                         RESULT = "BOOL";:};
 
 varInsAsig   ::= varIns:t1 varAsig:t2 {:if (!t1.equals(t2)) {System.out.println("ERROR VAR LOCAL-> El tipo de variable no coincide con el asignado");}:};
@@ -385,6 +513,11 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             currentHash = ID.toString();
                                                             fun.add(tipo);
                                                             scopePrograma.put(currentHash, fun);
+
+                                                            cod3D.append("\n\nbegin_func_" + ID.toString()+":");
+                                                            currentTemp = 0;
+                                                            currentFloat = 0;
+
                                                             RESULT = "INT";
                         :}
                 | FUNC SEP CHAR SEP IDENTIFIER:ID
@@ -396,6 +529,11 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             currentHash = ID.toString();
                                                             fun.add(tipo);
                                                             scopePrograma.put(currentHash, fun);
+
+                                                            cod3D.append("\n\nbegin_func_" + ID.toString()+":");
+                                                            currentTemp = 0;
+                                                            currentFloat = 0;
+
                                                             RESULT = "CHAR";
                         :}
                 | FUNC SEP BOOL SEP IDENTIFIER:ID
@@ -407,6 +545,11 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             currentHash = ID.toString();
                                                             fun.add(tipo);
                                                             scopePrograma.put(currentHash, fun);
+
+                                                            cod3D.append("\n\nbegin_func_" + ID.toString()+":");
+                                                            currentTemp = 0;
+                                                            currentFloat = 0;
+
                                                             RESULT = "BOOL";
                         :}
                 | FUNC SEP STRINGT SEP IDENTIFIER:ID
@@ -418,6 +561,11 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             currentHash = ID.toString();
                                                             fun.add(tipo);
                                                             scopePrograma.put(currentHash, fun);
+
+                                                            cod3D.append("\n\nbegin_func_" + ID.toString()+":");
+                                                            currentTemp = 0;
+                                                            currentFloat = 0;
+
                                                             RESULT = "STRING";
                         :}
                 | FUNC SEP FLOAT SEP IDENTIFIER:ID
@@ -429,6 +577,11 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             currentHash = ID.toString();
                                                             fun.add(tipo);
                                                             scopePrograma.put(currentHash, fun);
+
+                                                            cod3D.append("\n\nbegin_func_" + ID.toString()+":");
+                                                            currentTemp = 0;
+                                                            currentFloat = 0;
+
                                                             RESULT = "FLOAT";
                         :};
 
@@ -443,20 +596,29 @@ mainInitial  ::= FUNC SEP INT SEP MAIN
                                                         ArrayList<String> fun = new ArrayList<String>();
                                                         currentHash = "MAIN";
                                                         fun.add(tipo);
+
+                                                        cod3D.append("\nbegin_main_:");
+                                                        currentTemp = 0;
+                                                        currentFloat = 0;
+
                                                         scopePrograma.put(currentHash, fun);
                             :};
 
 mainStruc    ::= mainInitial DELIMETERBLOCK BLOCK DELIMETERBLOCK;
 
-paramFunc    ::= exprP COMA paramFunc 
-                | exprP;
+paramFunc    ::= exprP COMA paramFunc {: cantParams++; :}
+                | exprP {: cantParams++; :};
 
-funcInvo     ::= IDENTIFIER:ID PARENTS paramFunc PARENTC {: String tipo = getTipoFunc(ID.toString()); 
+funcInvo     ::= IDENTIFIER:ID PARENTS paramFunc PARENTC {: 
+                                                            cod3D.append("\ncall " + ID.toString() + ", " + cantParams);
+                                                            cantParams = 0;
+                                                            String tipo = getTipoFunc(ID.toString()); 
                                                             boolean existe = existeFun(ID.toString(), tipo);
                                                             if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");}
                                                             RESULT = tipo; :}
 
                 | IDENTIFIER:ID PARENTS PARENTC {: String tipo = getTipoFunc(ID.toString()); 
+                                                            cod3D.append("\ncall " + ID.toString() + ", " + 0);
                                                             boolean existe = existeFun(ID.toString(), tipo);
                                                             if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");}
                                                             RESULT = tipo; :};
@@ -542,7 +704,8 @@ printStruc ::= PRINT PARENTS numbers PARENTC
             | PRINT PARENTS STRING_LITERAL PARENTC;
 
 
-returnStruc ::=  RETURN SEP exprP:val ENDEXPR {: boolean valido = validarReturn(val.toString()); 
+returnStruc ::=  RETURN:ss SEP exprP:val ENDEXPR {:
+                                                boolean valido = validarReturn(val.toString()); 
                                                 if (!valido) {System.out.println("ERROR RETORNO -> Tipo de retorno distinto al de la funcion");}:}
         | RETURN ENDEXPR;
 

@@ -1348,6 +1348,19 @@ return lex.next_token();
         return false;
     }
 
+    public int countParam (String nombreFunc) {
+        ArrayList<String> currentFunc = scopePrograma.get(nombreFunc);
+        int cantParam = 0;
+
+        for (String elem : currentFunc) {
+            String[] expresion = elem.split(":");
+            String lexema = expresion[0].trim();
+            
+            
+            if(lexema.equals("Instancia PARAM") ){ cantParam++;}
+        }
+        return cantParam;
+    }
 
     //recuperacion de errores de sintaxis
     public void syntax_error(Symbol s) {
@@ -1358,6 +1371,12 @@ return lex.next_token();
     public void unrecovered_syntax_error(Symbol s) {
         System.out.println("!!Error fatal en : " +  s.value + " linea: " +  (s.left+1) +  " columna: " +  (s.right+1));
     } 
+
+    StringBuffer cod3D = new StringBuffer();
+    Integer currentTemp = 0;
+    Integer currentFloat = 0;
+    Integer stackPointer = 0;
+    Integer cantParams = 0;
 
 
 /** Cup generated class to encapsulate user supplied action code.*/
@@ -1413,7 +1432,7 @@ class CUP$Parser$actions {
               Object RESULT =null;
               // propagate RESULT from NT$0
                 RESULT = (Object) ((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
-
+		 System.out.println(cod3D.toString()); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("SI",2, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1953,7 +1972,10 @@ class CUP$Parser$actions {
           case 62: // numbers ::= INTEGER_LITERAL 
             {
               Object RESULT =null;
-		RESULT = "INT";
+		int litleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int litright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object lit = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = lit + ":" + "INT";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("numbers",23, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1962,7 +1984,10 @@ class CUP$Parser$actions {
           case 63: // numbers ::= FLOATNUM 
             {
               Object RESULT =null;
-		RESULT = "FLOAT";
+		int litleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int litright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object lit = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		RESULT = lit + ":" + "FLOAT";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("numbers",23, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -1989,7 +2014,9 @@ class CUP$Parser$actions {
 		int op2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 if(!op1.equals(op2)) {System.out.println("Error semantico, en esta suma los operadores deben ser del mismo tipo");} else {RESULT = op1;}
+		 
+                                                
+                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en esta suma los operadores deben ser del mismo tipo");} else {RESULT = op1;}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("compAritOp",6, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2004,7 +2031,8 @@ class CUP$Parser$actions {
 		int op2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 if(!op1.equals(op2)) {System.out.println("Error semantico, en esta resta los operadores deben ser del mismo tipo");} else {RESULT = op1;}
+		 
+                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en esta resta los operadores deben ser del mismo tipo");} else {RESULT = op1;}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("compAritOp",6, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2031,7 +2059,8 @@ class CUP$Parser$actions {
 		int op2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 if(!op1.equals(op2)) {System.out.println("Error semantico, en este producto los operadores deben ser del mismo tipo");} else {RESULT = op1;}
+		 
+                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en este producto los operadores deben ser del mismo tipo");} else {RESULT = op1;}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("term",8, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2046,7 +2075,8 @@ class CUP$Parser$actions {
 		int op2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 if(!op1.equals(op2)) {System.out.println("Error semantico, en este cociente los operadores deben ser del mismo tipo");} else {RESULT = op1;}
+		 
+                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en este cociente los operadores deben ser del mismo tipo");} else {RESULT = op1;}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("term",8, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2061,7 +2091,8 @@ class CUP$Parser$actions {
 		int op2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 if(!op1.equals(op2)) {System.out.println("Error semantico, en esta potencia los operadores deben ser del mismo tipo");} else {RESULT = op1;}
+		 
+                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en esta potencia los operadores deben ser del mismo tipo");} else {RESULT = op1;}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("term",8, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2076,7 +2107,8 @@ class CUP$Parser$actions {
 		int op2left = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int op2right = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object op2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 if(!op1.equals(op2)) {System.out.println("Error semantico, en este modulo los operadores deben ser del mismo tipo");} else {RESULT = op1;}
+		 
+                                                if(!op1.equals(op2)) {System.out.println("Error semantico, en este modulo los operadores deben ser del mismo tipo");} else {RESULT = op1;}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("term",8, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2088,7 +2120,16 @@ class CUP$Parser$actions {
 		int numeroleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int numeroright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object numero = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		RESULT = numero;
+		
+                String[] elementos = numero.toString().split(":");
+                if (elementos[1].equals("FLOAT")) {                
+                    String miTempId = "f"+currentFloat++;
+                    cod3D.append("\n" +  miTempId + "=" + elementos[0]);}
+                else {                
+                    String miTempId = "t"+currentTemp++;
+                    cod3D.append("\n" +  miTempId + "=" + elementos[0]);}
+
+                RESULT = elementos[1];
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2109,7 +2150,13 @@ class CUP$Parser$actions {
           case 74: // factor ::= STRING_LITERAL 
             {
               Object RESULT =null;
-		RESULT = "STRING";
+		int litleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int litright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object lit = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		
+                                String miTempId = "t"+currentTemp++;
+                                cod3D.append("\n" +  miTempId + "=" + lit.toString());
+                                RESULT = "STRING";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2118,7 +2165,13 @@ class CUP$Parser$actions {
           case 75: // factor ::= CHARSTR 
             {
               Object RESULT =null;
-		RESULT = "CHAR";
+		int litleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int litright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		Object lit = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		
+                        String miTempId = "t"+currentTemp++;
+                        cod3D.append("\n" +  miTempId + "=" + lit.toString());
+                        RESULT = "CHAR";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2130,7 +2183,21 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		String tipo = getTipo(ID.toString()); RESULT = tipo;
+		
+                                String tipo = getTipo(ID.toString()); 
+                                String baseTemp = "t";
+                                String miTempId;
+                                if (tipo.equals("float")) {
+                                    baseTemp = "f";
+                                    currentFloat++;
+                                    miTempId = baseTemp + currentFloat;}
+                                else {
+                                    currentTemp++;
+                                    miTempId = baseTemp + currentTemp;}
+
+                                cod3D.append("\n" + miTempId + "=" + ID.toString());
+
+                                RESULT = tipo + ":" + miTempId;
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2142,7 +2209,27 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
-		String tipo = getTipo(ID.toString()); RESULT = tipo;
+		String tipo = getTipo(ID.toString()); 
+                                        String baseTemp = "t";
+                                        String miTempId;
+                                        if (tipo.equals("float")) {
+                                            baseTemp = "f";
+                                            currentFloat++;
+                                            miTempId = baseTemp + currentFloat;}
+                                        else {
+                                            currentTemp++;
+                                            miTempId = baseTemp + currentTemp;}
+                                        cod3D.append("\n" + miTempId + "=" + ID.toString());
+                                        currentTemp++;
+                                        String miTemp1 = baseTemp + currentTemp;
+                                        currentTemp++;
+                                        String miTemp2 = baseTemp + currentTemp;
+
+                                        cod3D.append("\n" + miTemp1 + " = 1");
+                                        cod3D.append("\n" + miTemp2 + " = " + miTempId + "-" + miTemp1);
+                                        cod3D.append("\n" + ID.toString() + " = " + miTemp2);
+                                        
+                                        RESULT = tipo;
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2154,7 +2241,27 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
-		String tipo = getTipo(ID.toString()); RESULT = tipo;
+		String tipo = getTipo(ID.toString()); 
+                                        String baseTemp = "t";
+                                        String miTempId;
+                                        if (tipo.equals("float")) {
+                                            baseTemp = "f";
+                                            currentFloat++;
+                                            miTempId = baseTemp + currentFloat;}
+                                        else {
+                                            currentTemp++;
+                                            miTempId = baseTemp + currentTemp;}
+                                        cod3D.append("\n" + miTempId + "=" + ID.toString());
+                                        currentTemp++;
+                                        String miTemp1 = baseTemp + currentTemp;
+                                        currentTemp++;
+                                        String miTemp2 = baseTemp + currentTemp;
+
+                                        cod3D.append("\n" + miTemp1 + " = 1");
+                                        cod3D.append("\n" + miTemp2 + " = " + miTempId + "+" + miTemp1);
+                                        cod3D.append("\n" + ID.toString() + " = " + miTemp2);
+                                        
+                                        RESULT = tipo;
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2199,7 +2306,10 @@ class CUP$Parser$actions {
           case 82: // factor ::= MINUSW PARENTS compAritOp PARENTC 
             {
               Object RESULT =null;
-
+		int compleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
+		int compright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
+		Object comp = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
+		RESULT = comp;
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2208,7 +2318,10 @@ class CUP$Parser$actions {
           case 83: // factor ::= PARENTS compAritOp PARENTC 
             {
               Object RESULT =null;
-
+		int compleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
+		int compright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
+		Object comp = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
+		RESULT = comp;
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("factor",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2479,7 +2592,10 @@ class CUP$Parser$actions {
 		
                                                     boolean existe = existeVar(ID.toString(), "INT");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
-                                                    scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "INT");   
+                                                    scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "INT");  
+
+                                                    cod3D.append("\nlocal_data_int " + ID.toString());
+
                                                     RESULT = "INT";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varIns",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -2496,6 +2612,9 @@ class CUP$Parser$actions {
                                                     boolean existe = existeVar(ID.toString(), "CHAR");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
                                                     scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "CHAR");  
+
+                                                    cod3D.append("\nlocal_data_char " + ID.toString());
+
                                                     RESULT = "CHAR";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varIns",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -2512,6 +2631,9 @@ class CUP$Parser$actions {
                                                     boolean existe = existeVar(ID.toString(), "FLOAT");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");} 
                                                     scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "FLOAT");  
+
+                                                    cod3D.append("\nlocal_data_float " + ID.toString());
+
                                                     RESULT = "FLOAT";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varIns",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -2528,6 +2650,9 @@ class CUP$Parser$actions {
                                                     boolean existe = existeVar(ID.toString(), "BOOL");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
                                                     scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "BOOL");  
+
+                                                    cod3D.append("\nlocal_data_bool " + ID.toString());
+
                                                     RESULT = "BOOL";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varIns",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -2544,6 +2669,9 @@ class CUP$Parser$actions {
                                                     boolean existe = existeVar(ID.toString(), "STRING");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");} 
                                                     scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "STRING"); 
+
+                                                    cod3D.append("\nlocal_data_string " + ID.toString());
+
                                                     RESULT = "STRING";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varIns",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -2560,6 +2688,9 @@ class CUP$Parser$actions {
                                                         boolean existe = existeVarGlob(ID.toString(), "INT");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
                                                         scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "INT"); 
+
+                                                        cod3D.append("\nglobal_data_int " + ID.toString());
+
                                                         RESULT = "INT";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varInsGl",40, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -2575,7 +2706,10 @@ class CUP$Parser$actions {
 		          
                                                         boolean existe = existeVarGlob(ID.toString(), "CHAR");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");} 
-                                                        scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "CHAR"); 
+                                                        scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "CHAR");
+
+                                                        cod3D.append("\nglobal_data_char " + ID.toString());
+
                                                         RESULT = "CHAR";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varInsGl",40, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -2592,6 +2726,9 @@ class CUP$Parser$actions {
                                                         boolean existe = existeVarGlob(ID.toString(), "FLOAT");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
                                                         scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "FLOAT"); 
+
+                                                        cod3D.append("\nglobal_data_float " + ID.toString());
+
                                                         RESULT = "FLOAT";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varInsGl",40, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -2608,6 +2745,9 @@ class CUP$Parser$actions {
                                                         boolean existe = existeVarGlob(ID.toString(), "STRING");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
                                                         scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "STRING"); 
+
+                                                        cod3D.append("\nglobal_data_string " + ID.toString());
+
                                                         RESULT = "STRING";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varInsGl",40, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -2624,6 +2764,9 @@ class CUP$Parser$actions {
                                                         boolean existe = existeVarGlob(ID.toString(), "BOOL");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
                                                         scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "BOOL"); 
+
+                                                        cod3D.append("\nglobal_data_bool " + ID.toString());
+
                                                         RESULT = "BOOL";
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varInsGl",40, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -2674,6 +2817,11 @@ class CUP$Parser$actions {
                                                             currentHash = ID.toString();
                                                             fun.add(tipo);
                                                             scopePrograma.put(currentHash, fun);
+
+                                                            cod3D.append("\n\nbegin_func_" + ID.toString()+":");
+                                                            currentTemp = 0;
+                                                            currentFloat = 0;
+
                                                             RESULT = "INT";
                         
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("funInitial",27, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
@@ -2695,6 +2843,11 @@ class CUP$Parser$actions {
                                                             currentHash = ID.toString();
                                                             fun.add(tipo);
                                                             scopePrograma.put(currentHash, fun);
+
+                                                            cod3D.append("\n\nbegin_func_" + ID.toString()+":");
+                                                            currentTemp = 0;
+                                                            currentFloat = 0;
+
                                                             RESULT = "CHAR";
                         
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("funInitial",27, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
@@ -2716,6 +2869,11 @@ class CUP$Parser$actions {
                                                             currentHash = ID.toString();
                                                             fun.add(tipo);
                                                             scopePrograma.put(currentHash, fun);
+
+                                                            cod3D.append("\n\nbegin_func_" + ID.toString()+":");
+                                                            currentTemp = 0;
+                                                            currentFloat = 0;
+
                                                             RESULT = "BOOL";
                         
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("funInitial",27, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
@@ -2737,6 +2895,11 @@ class CUP$Parser$actions {
                                                             currentHash = ID.toString();
                                                             fun.add(tipo);
                                                             scopePrograma.put(currentHash, fun);
+
+                                                            cod3D.append("\n\nbegin_func_" + ID.toString()+":");
+                                                            currentTemp = 0;
+                                                            currentFloat = 0;
+
                                                             RESULT = "STRING";
                         
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("funInitial",27, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
@@ -2758,6 +2921,11 @@ class CUP$Parser$actions {
                                                             currentHash = ID.toString();
                                                             fun.add(tipo);
                                                             scopePrograma.put(currentHash, fun);
+
+                                                            cod3D.append("\n\nbegin_func_" + ID.toString()+":");
+                                                            currentTemp = 0;
+                                                            currentFloat = 0;
+
                                                             RESULT = "FLOAT";
                         
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("funInitial",27, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
@@ -2784,6 +2952,11 @@ class CUP$Parser$actions {
                                                         ArrayList<String> fun = new ArrayList<String>();
                                                         currentHash = "MAIN";
                                                         fun.add(tipo);
+
+                                                        cod3D.append("\nbegin_main_:");
+                                                        currentTemp = 0;
+                                                        currentFloat = 0;
+
                                                         scopePrograma.put(currentHash, fun);
                             
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("mainInitial",26, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
@@ -2803,7 +2976,7 @@ class CUP$Parser$actions {
           case 127: // paramFunc ::= exprP COMA paramFunc 
             {
               Object RESULT =null;
-
+		 cantParams++; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("paramFunc",36, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2812,7 +2985,7 @@ class CUP$Parser$actions {
           case 128: // paramFunc ::= exprP 
             {
               Object RESULT =null;
-
+		 cantParams++; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("paramFunc",36, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2824,7 +2997,10 @@ class CUP$Parser$actions {
 		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).left;
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
-		 String tipo = getTipoFunc(ID.toString()); 
+		 
+                                                            cod3D.append("\ncall " + ID.toString() + ", " + cantParams);
+                                                            cantParams = 0;
+                                                            String tipo = getTipoFunc(ID.toString()); 
                                                             boolean existe = existeFun(ID.toString(), tipo);
                                                             if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");}
                                                             RESULT = tipo; 
@@ -2840,6 +3016,7 @@ class CUP$Parser$actions {
 		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
 		 String tipo = getTipoFunc(ID.toString()); 
+                                                            cod3D.append("\ncall " + ID.toString() + ", " + 0);
                                                             boolean existe = existeFun(ID.toString(), tipo);
                                                             if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");}
                                                             RESULT = tipo; 
@@ -3222,10 +3399,14 @@ class CUP$Parser$actions {
           case 161: // returnStruc ::= RETURN SEP exprP ENDEXPR 
             {
               Object RESULT =null;
+		int ssleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).left;
+		int ssright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)).right;
+		Object ss = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
 		int valleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).left;
 		int valright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)).right;
 		Object val = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
-		 boolean valido = validarReturn(val.toString()); 
+		
+                                                boolean valido = validarReturn(val.toString()); 
                                                 if (!valido) {System.out.println("ERROR RETORNO -> Tipo de retorno distinto al de la funcion");}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("returnStruc",24, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }

@@ -5,8 +5,12 @@ glob:int:array:xd1[11];
 
 func:int:xd_
         loc:int:x22;
+        param:int:xddd;
         loc:int:var;
-        if(!(x22<=45)&&var>5 && "dfd") _ print(3);_
+        var = "Ss";
         return:2;
+        var--;
+        xd(xd, 12);
+        xd();
 _
 
