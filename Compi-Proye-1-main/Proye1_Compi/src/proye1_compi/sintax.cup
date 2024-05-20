@@ -172,6 +172,20 @@ parser code {:
         return cantParam;
     }
 
+    public void writeAsignArr(String id) {
+        String texto = "[";
+        
+        for(int i = 0; i < elementosArray.size(); i++) {
+            Integer y = elementosArray.size();
+            Integer x = currentTemp - y + 1 + i;
+            texto = texto + "t" + x;
+            
+            if (!y.equals(i + 1)) {texto = texto + ", ";}
+        }
+        texto = texto + "]";
+        cod3D.append("\n" + id + "=" + texto);
+    }
+
     //recuperacion de errores de sintaxis
     public void syntax_error(Symbol s) {
         System.out.println("!!Error de Sintaxis en : " +  s.value + " linea: " +  (s.left+1) +  " columna: " +  (s.right+1));
@@ -187,6 +201,8 @@ parser code {:
     Integer currentFloat = 0;
     Integer stackPointer = 0;
     Integer cantParams = 0;
+    Integer currentParam = 0;
+    Integer currentStruc = 0;
     ArrayList<String> elementosArray = new ArrayList<>();
 :}
 
@@ -214,7 +230,7 @@ non terminal            expr_list;
 non terminal            Integer expr;// used to store evaluated subexpressions
 non terminal            SI, varIns, varAsig, BLOCK, compAritOp, factor, term, funcStruc, mainStruc, types, printStruc;
 non terminal            ifStruc, ifElseStruc, whileStruc, arrayIns, arrayAsig, arrayInsAsign, elementos, switchStruc, caseStruc, forStruc, numbers;
-non terminal            returnStruc, inputStruc, mainInitial, funInitial, exprP, exprLog, exprUni, opRel, opLog, arrayElement, paramStruc, paramList, paramFunc, funcInvo, GEN, arrayInsGl, varInsGl, varInsAsig, varInsAsigGl, arrayInsAsignGl;
+non terminal            forStrucBegin3, forStrucBegin2, forStrucBegin, whileBegin, elseStruc, ifStrucComplete, returnStruc, inputStruc, mainInitial, funInitial, exprP, exprLog, exprUni, opRel, opLog, arrayElement, paramStruc, paramList, paramFunc, funcInvo, GEN, arrayInsGl, varInsGl, varInsAsig, varInsAsigGl, arrayInsAsignGl;
 
 /* Orden de precedencia */
 precedence left PLUS, MINUSW;
@@ -244,7 +260,7 @@ BLOCK ::= BLOCK exprP ENDEXPR
         | BLOCK mainStruc
         | BLOCK funcStruc 
         | BLOCK varIns ENDEXPR
-        | BLOCK ifStruc 
+        | BLOCK ifStrucComplete 
         | BLOCK ifElseStruc 
         | BLOCK whileStruc 
         | BLOCK switchStruc 
@@ -269,7 +285,7 @@ BLOCK ::= BLOCK exprP ENDEXPR
         | arrayInsAsignGl
         | varInsAsig 
         | varIns ENDEXPR
-        | ifStruc 
+        | ifStrucComplete 
         | ifElseStruc
         | switchStruc
         | forStruc
@@ -494,7 +510,8 @@ factor     ::= numbers:numero {:
                 | PARENTS compAritOp:comp PARENTC {:RESULT = comp;:};  
 
 
-inputStruc ::= INPUT PARENTS IDENTIFIER PARENTC ENDEXPR;
+inputStruc ::= INPUT PARENTS IDENTIFIER PARENTC ENDEXPR {:
+                :};
 
 
 //Manejo de distintas expresiones de comparacion y union
@@ -505,21 +522,17 @@ exprP ::= exprLog:expL {:RESULT = expL;:}
 exprLog ::= compAritOp:op1 opRel:op compAritOp:op2 {: 
                                                     String[] elementos1 = op1.toString().split(":");
                                                     String[] elementos2 = op2.toString().split(":");
-                                                    System.out.println(elementos2[1]);
 
                                                     if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error, la comparacion debe ser entre valores del mismo tipo"); RESULT = elementos1[0] + ":" + "NULL";} else 
                                                     {
                                                     String baseTemp = "t";
-                                                    currentTemp++;
-                                                    String miTempId = baseTemp + currentTemp + " = " + elementos1[0];
-                                                    currentTemp++;
-                                                    cod3D.append("\n" + miTempId);
-                                                    String miTempId2 = baseTemp + currentTemp + " = " + elementos2[0];
-                                                    int x = currentTemp - 2;
+                                                    if (elementos1[1].equals("FLOAT")) {baseTemp = "f";}
+
+
+                                                    int x = currentTemp - 1;
                                                     int y = x + 1;
-                                                    cod3D.append("\n" + miTempId2);
                                                     currentTemp++;
-                                                    String miTempId3 = baseTemp + currentTemp + " = t" + y + op.toString() + "t" + x;
+                                                    String miTempId3 = baseTemp + currentTemp + " = " + baseTemp + y + op.toString() + "t" + x;
                                                     cod3D.append("\n" + miTempId3);
 
                                                     RESULT = baseTemp + currentTemp + ":" + "BOOL";} :}
@@ -530,18 +543,14 @@ exprLog ::= compAritOp:op1 opRel:op compAritOp:op2 {:
 
 exprUni ::= exprLog:op1 opLog:op exprP:op2  {: String[] elementos1 = op1.toString().split(":");
                                             String[] elementos2 = op2.toString().split(":");
-                                            System.out.println(op2);
+                                            
                                             if(elementos1[1].equals("BOOL") && elementos2[1].equals("BOOL")) 
                                             {
                                                 String baseTemp = "t";
-                                                currentTemp++;
-                                                String miTempId = baseTemp + currentTemp + " = " + elementos1[0];
-                                                currentTemp++;
-                                                cod3D.append("\n" + miTempId);
-                                                String miTempId2 = baseTemp + currentTemp + " = " + elementos2[0];
+
                                                 int x = currentTemp - 2;
                                                 int y = x + 1;
-                                                cod3D.append("\n" + miTempId2);
+                                                
                                                 currentTemp++;
                                                 String miTempId3 = baseTemp + currentTemp + " = t" + y + op.toString() + "t" + x;
                                                 cod3D.append("\n" + miTempId3);
@@ -557,14 +566,10 @@ exprUni ::= exprLog:op1 opLog:op exprP:op2  {: String[] elementos1 = op1.toStrin
                                             {
                                                 
                                                 String baseTemp = "t";
-                                                currentTemp++;
-                                                String miTempId = baseTemp + currentTemp + " = " + elementos1[0];
-                                                cod3D.append("\n" + miTempId);
-                                                currentTemp++;
-                                                String miTempId2 = baseTemp + currentTemp + " = " + ID.toString();
-                                                int x = currentTemp - 2;
+
+                                                int x = currentTemp - 1;
                                                 int y = x + 1;
-                                                cod3D.append("\n" + miTempId2);
+
                                                 currentTemp++;
                                                 String miTempId3 = baseTemp + currentTemp + " = t" + y + op.toString() + "t" + x;
 
@@ -586,8 +591,15 @@ varAsig      ::=  IDENTIFIER:ID EQ exprP:val ENDEXPR  {:
                                                     if (!existe && !existe2) {System.out.println("Esta variable -> " + ID.toString() + " <- no existe");}
                                                     String[] valores = val.toString().split(":");
                                                     
+                                                    currentTemp++;
+                                                    String baseTemp = "t";
+                                                    if (tipo.equals("FLOAT")) {baseTemp = "f";}
+                                                    cod3D.append("\n" + baseTemp + currentTemp + " = " + valores[0]);
+                                                    cod3D.append("\n" + ID.toString() + " = " + baseTemp + currentTemp);
+
                                                     if(!tipo.equals(valores[1])) {System.out.println("Error semantico, el tipo de la variable no coincide con el asignado");} else {RESULT = tipo;}:}
-                | EQ exprP:val ENDEXPR {:RESULT = val;:};
+                | EQ exprP:val ENDEXPR {:
+                                        RESULT = val;:};
 
 
 //Instanciacion simple de variables
@@ -598,7 +610,7 @@ varIns       ::= LOC SEP INT SEP IDENTIFIER:ID    {:
 
                                                     cod3D.append("\nlocal_data_int " + ID.toString());
 
-                                                    RESULT = "INT";:}
+                                                    RESULT = ID.toString() + ":" + "INT";:}
                 | LOC SEP CHAR SEP IDENTIFIER:ID     {: 
                                                     boolean existe = existeVar(ID.toString(), "CHAR");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
@@ -606,7 +618,7 @@ varIns       ::= LOC SEP INT SEP IDENTIFIER:ID    {:
 
                                                     cod3D.append("\nlocal_data_char " + ID.toString());
 
-                                                    RESULT = "CHAR";:}   
+                                                    RESULT = ID.toString() + ":" + "CHAR";:}   
                 | LOC SEP FLOAT SEP IDENTIFIER:ID    {: 
                                                     boolean existe = existeVar(ID.toString(), "FLOAT");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");} 
@@ -614,7 +626,7 @@ varIns       ::= LOC SEP INT SEP IDENTIFIER:ID    {:
 
                                                     cod3D.append("\nlocal_data_float " + ID.toString());
 
-                                                    RESULT = "FLOAT";:}
+                                                    RESULT = ID.toString() + ":" + "FLOAT";:}
                 | LOC SEP BOOL SEP IDENTIFIER:ID     {: 
                                                     boolean existe = existeVar(ID.toString(), "BOOL");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
@@ -622,7 +634,7 @@ varIns       ::= LOC SEP INT SEP IDENTIFIER:ID    {:
 
                                                     cod3D.append("\nlocal_data_bool " + ID.toString());
 
-                                                    RESULT = "BOOL";:}  
+                                                    RESULT = ID.toString() + ":" + "BOOL";:}  
                 | LOC SEP STRINGT SEP IDENTIFIER:ID  {: 
                                                     boolean existe = existeVar(ID.toString(), "STRING");
                                                     if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");} 
@@ -630,7 +642,7 @@ varIns       ::= LOC SEP INT SEP IDENTIFIER:ID    {:
 
                                                     cod3D.append("\nlocal_data_string " + ID.toString());
 
-                                                    RESULT = "STRING";:};
+                                                    RESULT = ID.toString() + ":" + "STRING";:};
 
 
 
@@ -641,7 +653,7 @@ varInsGl     ::=  GLOB SEP INT SEP IDENTIFIER:ID     {:
 
                                                         cod3D.append("\nglobal_data_int " + ID.toString());
 
-                                                        RESULT = "INT";:}
+                                                        RESULT = ID.toString() + ":" + "INT";:}
                 | GLOB SEP CHAR SEP IDENTIFIER:ID       {:          
                                                         boolean existe = existeVarGlob(ID.toString(), "CHAR");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");} 
@@ -649,7 +661,7 @@ varInsGl     ::=  GLOB SEP INT SEP IDENTIFIER:ID     {:
 
                                                         cod3D.append("\nglobal_data_char " + ID.toString());
 
-                                                        RESULT = "CHAR";:}
+                                                        RESULT = ID.toString() + ":" + "CHAR";:}
                 | GLOB SEP FLOAT SEP IDENTIFIER:ID      {:
                                                         boolean existe = existeVarGlob(ID.toString(), "FLOAT");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
@@ -657,7 +669,7 @@ varInsGl     ::=  GLOB SEP INT SEP IDENTIFIER:ID     {:
 
                                                         cod3D.append("\nglobal_data_float " + ID.toString());
 
-                                                        RESULT = "FLOAT";:}
+                                                        RESULT = ID.toString() + ":" + "FLOAT";:}
                 | GLOB SEP STRINGT SEP IDENTIFIER:ID    {:
                                                         boolean existe = existeVarGlob(ID.toString(), "STRING");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
@@ -665,7 +677,7 @@ varInsGl     ::=  GLOB SEP INT SEP IDENTIFIER:ID     {:
 
                                                         cod3D.append("\nglobal_data_string " + ID.toString());
 
-                                                        RESULT = "STRING";:}
+                                                        RESULT = ID.toString() + ":" + "STRING";:}
                 | GLOB SEP BOOL SEP IDENTIFIER:ID       {: 
                                                         boolean existe = existeVarGlob(ID.toString(), "BOOL");
                                                         if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
@@ -673,10 +685,28 @@ varInsGl     ::=  GLOB SEP INT SEP IDENTIFIER:ID     {:
 
                                                         cod3D.append("\nglobal_data_bool " + ID.toString());
 
-                                                        RESULT = "BOOL";:};
+                                                        RESULT = ID.toString() + ":" + "BOOL";:};
 
-varInsAsig   ::= varIns:t1 varAsig:t2 {:if (!t1.equals(t2)) {System.out.println("ERROR VAR LOCAL-> El tipo de variable no coincide con el asignado");}:};
-varInsAsigGl   ::= varInsGl:t1 varAsig:t2 {:if (!t1.equals(t2)) {System.out.println("ERROR VAR GLOB-> El tipo de variable no coincide con el asignado");}:};
+varInsAsig   ::= varIns:t1 varAsig:t2 {:
+                                        String[] valores1 = t1.toString().split(":");
+                                        String[] valores2 = t2.toString().split(":");
+
+                                        String baseTemp = "t";
+                                        if (valores1[1].equals("FLOAT")) {baseTemp = "f";}
+                                        
+                                        cod3D.append("\n" + valores1[0] + " = " + baseTemp + currentTemp);
+
+                                        if (!valores1[1].equals(valores2[1])) {System.out.println("ERROR VAR LOCAL-> El tipo de variable no coincide con el asignado");}:};
+
+varInsAsigGl   ::= varInsGl:t1 varAsig:t2 {:
+                                        String[] valores1 = t1.toString().split(":");
+                                        String[] valores2 = t2.toString().split(":");
+                                        String baseTemp = "t";
+                                        if (valores1[1].equals("FLOAT")) {baseTemp = "f";}
+                                        
+                                        cod3D.append("\n" + valores1[0] + " = " + baseTemp + currentTemp);
+
+                                        if (!valores1[1].equals(valores2[1])) {System.out.println("ERROR VAR GLOB-> El tipo de variable no coincide con el asignado");}:};
 
 funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                         {:   String tipo;
@@ -691,6 +721,7 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             cod3D.append("\n\nbegin_func_" + ID.toString()+":");
                                                             currentTemp = 0;
                                                             currentFloat = 0;
+                                                            currentParam = 0;
 
                                                             RESULT = "INT";
                         :}
@@ -707,6 +738,7 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             cod3D.append("\n\nbegin_func_" + ID.toString()+":");
                                                             currentTemp = 0;
                                                             currentFloat = 0;
+                                                            currentParam = 0;
 
                                                             RESULT = "CHAR";
                         :}
@@ -723,6 +755,7 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             cod3D.append("\n\nbegin_func_" + ID.toString()+":");
                                                             currentTemp = 0;
                                                             currentFloat = 0;
+                                                            currentParam = 0;
 
                                                             RESULT = "BOOL";
                         :}
@@ -739,6 +772,7 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             cod3D.append("\n\nbegin_func_" + ID.toString()+":");
                                                             currentTemp = 0;
                                                             currentFloat = 0;
+                                                            currentParam = 0;
 
                                                             RESULT = "STRING";
                         :}
@@ -755,6 +789,7 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             cod3D.append("\n\nbegin_func_" + ID.toString()+":");
                                                             currentTemp = 0;
                                                             currentFloat = 0;
+                                                            currentParam = 0;
 
                                                             RESULT = "FLOAT";
                         :};
@@ -774,6 +809,7 @@ mainInitial  ::= FUNC SEP INT SEP MAIN
                                                         cod3D.append("\nbegin_main_:");
                                                         currentTemp = 0;
                                                         currentFloat = 0;
+                                                        currentParam = 0;
 
                                                         scopePrograma.put(currentHash, fun);
                             :};
@@ -784,52 +820,99 @@ paramFunc    ::= exprP COMA paramFunc {: cantParams++; :}
                 | exprP {: cantParams++; :};
 
 funcInvo     ::= IDENTIFIER:ID PARENTS paramFunc PARENTC {: 
-                                                            currentTemp++;
-                                                            cod3D.append("\nt" + currentTemp + "= call " + ID.toString() + ", " + cantParams);
-                                                            cantParams = 0;
                                                             String tipo = getTipoFunc(ID.toString()); 
+                                                            currentTemp++;
+                                                            String baseTemp = "t";
+                                                            if (tipo.equals("FLOAT")) {baseTemp = "f";}
+                                                            
+                                                            cod3D.append("\n" + baseTemp + currentTemp + "= call " + ID.toString() + ", " + cantParams);
+                                                            
+                                                            
                                                             boolean existe = existeFun(ID.toString(), tipo);
                                                             if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");}
+                                                            Integer numberOfParams = countParam(ID.toString());
+                                                            if (!numberOfParams.equals(cantParams)) {System.out.println("ERROR -> La cantidad de parametros enviados no coincide con los esperados por la funcion");}
+                                                            cantParams = 0;
+
                                                             RESULT = tipo; :}
 
-                | IDENTIFIER:ID PARENTS PARENTC {: String tipo = getTipoFunc(ID.toString()); 
+                | IDENTIFIER:ID PARENTS PARENTC {:          String tipo = getTipoFunc(ID.toString()); 
                                                             currentTemp++;
-                                                            cod3D.append("\nt" + currentTemp + "= call " + ID.toString() + ", " + 0);
+                                                            String baseTemp = "t";
+                                                            if (tipo.equals("FLOAT")) {baseTemp = "f";}
+                                                            
+                                                            cod3D.append("\n" + baseTemp + currentTemp + "= call " + ID.toString() + ", " + cantParams);
                                                             boolean existe = existeFun(ID.toString(), tipo);
                                                             if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");}
+                                                            Integer numberOfParams = countParam(ID.toString());
+                                                            if (!numberOfParams.equals(0)) {System.out.println("ERROR -> La cantidad de parametros enviados no coincide con los esperados por la funcion");}
                                                             RESULT = tipo; :};
 
 
 
-ifStruc      ::= IF PARENTS exprP PARENTC DELIMETERBLOCK BLOCK DELIMETERBLOCK   {:System.out.println("Se declaro estructura condicional IF");:};
-ifElseStruc  ::= ifStruc ELSE DELIMETERBLOCK BLOCK DELIMETERBLOCK;
+ifStruc      ::= {: currentStruc++;
+                cod3D.append("\nif_begin" + currentStruc + ":"); :}
+                IF PARENTS exprP:val PARENTC
+                {:String[] elementos1 = val.toString().split(":");
+                cod3D.append("\nif " + elementos1[0] + " goto ifblock" + currentStruc);
+                cod3D.append("\ngoto else_begin" + currentStruc);
+                cod3D.append("\nifblock" + currentStruc + ":");:};
 
+ifStrucComplete ::= ifStruc DELIMETERBLOCK BLOCK DELIMETERBLOCK 
+                                                            {: cod3D.append("\nif_end" + currentStruc + ":"); :};
 
+ifElseStruc  ::= 
+            ifStrucComplete elseStruc;
+
+elseStruc ::= {: cod3D.append("\nelse_begin" + currentStruc + ":"); :} ELSE DELIMETERBLOCK BLOCK DELIMETERBLOCK
+            {: cod3D.append("\nelse_end" + currentStruc + ":"); :};
 //Produccion while
-whileStruc   ::= WHILE PARENTS exprP PARENTC DELIMETERBLOCK BLOCK DELIMETERBLOCK   {:System.out.println("Se declaro el ciclo while");:};
+
+whileBegin ::= {:currentStruc++;
+                cod3D.append("\nwhile_begin" + currentStruc + ":"); :}
+            WHILE PARENTS exprP:val PARENTC
+            {:  String[] elementos1 = val.toString().split(":");
+                cod3D.append("\nif " + elementos1[0] + " goto whileBlock" + currentStruc);
+                cod3D.append("\ngoto end_while" + currentStruc);
+                cod3D.append("\nwhileBlock" + currentStruc + ":");
+                RESULT = elementos1[0];:};
+
+whileStruc   ::= whileBegin:val DELIMETERBLOCK BLOCK DELIMETERBLOCK
+                {:
+                cod3D.append("\nend_block_while" + currentStruc + ":");
+                cod3D.append("\nif " + val.toString() + " goto whileBlock" + currentStruc);
+                cod3D.append("\nend_while" + currentStruc + ":");:};
 
 //Declaracion, asignacion y acceso a un array
 arrayIns ::=  LOC SEP INT SEP ARRAY SEP IDENTIFIER:ID SQUARES INTEGER_LITERAL SQUAREC {: 
                                                                                         boolean existe = existeArr(ID.toString(), "INT");
                                                                                         if (existe) {System.out.println("El array local -> " + ID.toString() + " <- ya fue declarado");}  
                                                                                         scopePrograma.get(currentHash).add("Instancia LOC ARR: " + ID.toString() + ":" + "INT"); 
-                                                                                        RESULT = "INT";:}
+                                                                                        cod3D.append("\nlocal_data_arr_int " + ID.toString());
+
+                                                                                        RESULT = ID.toString() + ":" + "INT";:}
             | LOC SEP CHAR SEP ARRAY SEP IDENTIFIER:ID SQUARES INTEGER_LITERAL SQUAREC {: 
                                                                                         boolean existe = existeArr(ID.toString(), "CHAR");
                                                                                         if (existe) {System.out.println("El array local -> " + ID.toString() + " <- ya fue declarado");}
                                                                                         scopePrograma.get(currentHash).add("Instancia LOC ARR: " + ID.toString() + ":" + "CHAR"); 
-                                                                                        RESULT = "CHAR";:};
+                                                                                        cod3D.append("\nlocal_data_arr_char " + ID.toString());
+
+                                                                                        RESULT = ID.toString() + ":" + "CHAR";:};
 
 arrayInsGl ::=  GLOB SEP INT SEP ARRAY SEP IDENTIFIER:ID SQUARES INTEGER_LITERAL SQUAREC  {: 
                                                                                         boolean existe = existeArrGlob(ID.toString(), "INT");
                                                                                         if (existe) {System.out.println("El array global -> " + ID.toString() + " <- ya fue declarado");}
                                                                                         scopePrograma.get(globalHash).add("Instancia GLOB ARR: " + ID.toString() + ":" + "INT"); 
-                                                                                        RESULT = "INT";:}
+                                                                                        cod3D.append("\nglobal_data_arr_int " + ID.toString());
+
+                                                                                        RESULT = ID.toString() + ":" + "INT";;:}
             | GLOB SEP CHAR SEP ARRAY SEP IDENTIFIER:ID SQUARES INTEGER_LITERAL SQUAREC {: 
                                                                                         boolean existe = existeArrGlob(ID.toString(), "CHAR");
                                                                                         if (existe) {System.out.println("El array global -> " + ID.toString() + " <- ya fue declarado");}
                                                                                         scopePrograma.get(globalHash).add("Instancia GLOB ARR: " + ID.toString() + ":" + "CHAR"); 
-                                                                                        RESULT = "INT";:};
+                                                                                        cod3D.append("\nglobal_data_arr_char " + ID.toString());
+
+                                                                                        RESULT = ID.toString() + ":" + "CHAR";;:};
 
 //Declaracion de ARRAYS Y TODO LO RELACIONADO
 arrayAsig ::= IDENTIFIER:ID EQ SQUARES elementos SQUAREC ENDEXPR {:
@@ -837,9 +920,11 @@ arrayAsig ::= IDENTIFIER:ID EQ SQUARES elementos SQUAREC ENDEXPR {:
                                                                         boolean existe = existeArr(ID.toString(), tipo);
                                                                         boolean existe2 = existeArrGlob(ID.toString(), tipo);
                                                                         if (!existe && !existe2) {System.out.println("Este array -> " + ID.toString() + " <- no existe");}
+                                                                        writeAsignArr(ID.toString());
 
                                                                         if (!todosIguales(elementosArray)) {System.out.println("Los elementos asignados deben coincidir en tipo entre ellos y de acuerdo al arreglo");}
-                                                                        elementosArray.clear();:}
+                                                                        elementosArray.clear();
+                                                                        RESULT = ID.toString() + ":" + tipo;:}
             | EQ SQUARES elementos:elem SQUAREC ENDEXPR {:RESULT = elem;:};
 
 elementos ::= compAritOp:val1 COMA elementos:val2 {:String[] elementos1 = val1.toString().split(":");
@@ -849,10 +934,20 @@ elementos ::= compAritOp:val1 COMA elementos:val2 {:String[] elementos1 = val1.t
                                 elementosArray.add(elementos1[1]);; :};
 
 arrayInsAsign ::= arrayIns:t1 arrayAsig:t2 {:
-                                            if (!t1.equals(t2)) {System.out.println("ERROR ARRAY LOC -> No todos los valores coinciden con el tipo instanciado");}:};
+                                            String[] elementos1 = t1.toString().split(":");
+                                            if (!todosIguales(elementosArray)) {System.out.println("Los elementos asignados deben coincidir en tipo entre ellos y de acuerdo al arreglo");}
+                                            String tipo = elementosArray.get(0);
+                                            writeAsignArr(elementos1[0]);
+                                            if (!elementos1[1].equals(tipo)) {System.out.println("ERROR ARRAY LOC -> No todos los valores coinciden con el tipo instanciado");};
+                                            elementosArray.clear();:};
 
 arrayInsAsignGl ::= arrayInsGl:t1 arrayAsig:t2 {:
-                                            if (!t1.equals(t2)) {System.out.println("ERROR ARRAY GLOB -> No todos los valores coinciden con el tipo instanciado");}:};
+                                            String[] elementos1 = t1.toString().split(":");
+                                            if (!todosIguales(elementosArray)) {System.out.println("Los elementos asignados deben coincidir en tipo entre ellos y de acuerdo al arreglo");}
+                                            String tipo = elementosArray.get(0);
+                                            writeAsignArr(elementos1[0]);
+                                            if (!elementos1[1].equals(tipo)) {System.out.println("ERROR ARRAY GLOB -> No todos los valores coinciden con el tipo instanciado");}
+                                            elementosArray.clear();:};
 
 arrayElement ::= IDENTIFIER:ID SQUARES INTEGER_LITERAL:lit SQUAREC {: currentTemp++;
                                                                 cod3D.append("\nt" + currentTemp + " = " + ID.toString() + ", " + lit);
@@ -866,91 +961,183 @@ caseStruc ::= CASE SEP compAritOp SEP BLOCK caseStruc
 
 
 //Declaracion de FOR
-forStruc ::= FOR SEP IDENTIFIER SEP IN SEP RANGE PARENTS exprP:expr1 COMA exprP:expr2 PARENTC DELIMETERBLOCK BLOCK DELIMETERBLOCK {: if(!expr1.equals("INT") || !expr2.equals("INT")) {System.out.println("ERROR SEMANTICO -> Los parametros del range deben ser de tipo entero");} :}
-            | FOR SEP IDENTIFIER SEP IN SEP RANGE PARENTS exprP:expr1 PARENTC DELIMETERBLOCK BLOCK DELIMETERBLOCK {: if(!expr1.equals("INT")) {System.out.println("ERROR SEMANTICO -> Los parametros del range deben ser de tipo entero");} :}
-            | FOR SEP IDENTIFIER SEP IN SEP RANGE PARENTS exprP:expr1 COMA exprP:expr2 COMA exprP:expr3 PARENTC DELIMETERBLOCK BLOCK DELIMETERBLOCK {: if(!expr1.equals("INT") || !expr2.equals("INT") || !expr3.equals("INT")) {System.out.println("ERROR SEMANTICO -> Los parametros del range deben ser de tipo entero");} :};
+forStrucBegin ::= FOR SEP IDENTIFIER:val SEP IN SEP RANGE PARENTS exprP:expr1 PARENTC {: 
+                                            currentStruc++;  
+                                            String[] elementos1 = expr1.toString().split(":");
+                                            if(!elementos1[1].equals("INT")) {System.out.println("ERROR SEMANTICO -> Los parametros del range deben ser de tipo entero");}
+                                            
+                                            cod3D.append("\nfor_begin" + currentStruc + ":");
+                                            String mitemp1 = "local_data_int " + val.toString();
+                                            cod3D.append("\n" + mitemp1);
+                                            String mitemp2 = val.toString() + " = " + 0;
+                                            cod3D.append("\n" + mitemp2);
+
+                                            currentTemp++;
+                                            String mitemp3 = "t" + currentTemp + " = " + elementos1[0];
+                                            cod3D.append("\n" + mitemp3);
+                                            currentTemp++;
+                                            Integer x = currentTemp - 1;
+                                            String mitemp4 = "t" + currentTemp + " = " + val.toString() + " < " + "t" + x;
+                                            cod3D.append("\n" + mitemp4);
+                                            cod3D.append("\nif " + "t" + currentTemp + " goto forBlock" + currentStruc);
+                                            cod3D.append("\n" + "goto for_end" + currentStruc);
+                                            cod3D.append("\n" + "forBlock" + currentStruc + ":");
+                                            RESULT = val.toString() + ":" + elementos1[0];:};
+
+forStrucBegin2 ::= FOR SEP IDENTIFIER:val SEP IN SEP RANGE PARENTS exprP:expr1 COMA exprP:expr2 {:
+                                            String[] elementos1 = expr1.toString().split(":");
+                                            String[] elementos2 = expr2.toString().split(":");
+                                            currentStruc++; 
+                                            if(!elementos1[1].equals("INT") || !elementos2[1].equals("INT")) {System.out.println("ERROR SEMANTICO -> Los parametros del range deben ser de tipo entero");}
+
+                                            cod3D.append("\nfor_begin" + currentStruc + ":");
+                                            String mitemp1 = "local_data_int " + val.toString();
+                                            cod3D.append("\n" + mitemp1);
+                                            String mitemp2 = val.toString() + " = " + elementos1[0];
+                                            cod3D.append("\n" + mitemp2);
+
+                                            currentTemp++;
+                                            String mitemp3 = "t" + currentTemp + " = " + elementos2[0];
+                                            cod3D.append("\n" + mitemp3);
+                                            currentTemp++;
+                                            Integer x = currentTemp - 1;
+                                            String mitemp4 = "t" + currentTemp + " = " + val.toString() + " < " + "t" + x;
+                                            cod3D.append("\n" + mitemp4);
+                                            cod3D.append("\nif " + "t" + currentTemp + " goto forBlock" + currentStruc);
+                                            cod3D.append("\n" + "goto for_end" + currentStruc);
+                                            cod3D.append("\n" + "forBlock" + currentStruc + ":");
+                                            RESULT = val.toString() + ":" + elementos2[0];:};
+
+forStrucBegin3 ::= FOR SEP IDENTIFIER:val SEP IN SEP RANGE PARENTS exprP:expr1 COMA exprP:expr2 COMA exprP:expr3 PARENTC {:
+                                            String[] elementos1 = expr1.toString().split(":");
+                                            String[] elementos2 = expr2.toString().split(":");
+                                            String[] elementos3 = expr3.toString().split(":");
+                                            currentStruc++;
+                                            if(!elementos1[1].equals("INT") || !elementos2[1].equals("INT") || !elementos3[1].equals("INT")) {System.out.println("ERROR SEMANTICO -> Los parametros del range deben ser de tipo entero");} 
+                                            
+                                            cod3D.append("\nfor_begin" + currentStruc + ":");
+                                            String mitemp1 = "local_data_int " + val.toString();
+                                            cod3D.append("\n" + mitemp1);
+                                            String mitemp2 = val.toString() + " = " + elementos1[0];
+                                            cod3D.append("\n" + mitemp2);
+
+                                            currentTemp++;
+                                            String mitemp3 = "t" + currentTemp + " = " + elementos2[0];
+                                            cod3D.append("\n" + mitemp3);
+                                            currentTemp++;
+                                            Integer x = currentTemp - 1;
+                                            String mitemp4 = "t" + currentTemp + " = " + val.toString() + " < " + "t" + x;
+                                            cod3D.append("\n" + mitemp4);
+                                            cod3D.append("\nif " + "t" + currentTemp + " goto forBlock" + currentStruc);
+                                            cod3D.append("\n" + "goto for_end" + currentStruc);
+                                            cod3D.append("\n" + "forBlock" + currentStruc + ":");
+                                            RESULT = val.toString() + ":" + elementos2[0] + ":" + elementos3[0];:};
+
+forStruc ::= forStrucBegin2:expr1 PARENTC DELIMETERBLOCK BLOCK DELIMETERBLOCK 
+            {: 
+                String[] elementos1 = expr1.toString().split(":");
+                currentTemp++;
+                cod3D.append("\nfor_end_block" + currentStruc + ":");
+                String mitemp = "\nt" + currentTemp + " = 1";
+                cod3D.append(mitemp);
+                String idTemp = elementos1[0].toString();
+                cod3D.append("\n" + idTemp + " = t" + currentTemp + " + " + idTemp);
+                currentTemp++;
+                String mitemp2 = "\nt" + currentTemp + " = " + elementos1[1];
+                cod3D.append(mitemp2);
+                currentTemp++;
+                Integer x = currentTemp - 1;
+                String mitemp3 = "\nt" + currentTemp + " = " + idTemp + " < " + "t" + x;
+                cod3D.append(mitemp3);
+                cod3D.append("\nif " + "t" + currentTemp + " goto forBlock" + currentStruc);
+                cod3D.append("\nfor_end" + currentStruc + ":");:}
+
+            | forStrucBegin:expr1 DELIMETERBLOCK BLOCK DELIMETERBLOCK {: 
+
+                String[] elementos1 = expr1.toString().split(":");
+                currentTemp++;
+                cod3D.append("\nfor_end_block" + currentStruc + ":");
+                String mitemp = "\nt" + currentTemp + " = 1";
+                cod3D.append(mitemp);
+                String idTemp = elementos1[0].toString();
+                cod3D.append("\n" + idTemp + " = t" + currentTemp + " + " + idTemp);
+                currentTemp++;
+                String mitemp2 = "\nt" + currentTemp + " = " + elementos1[1];
+                cod3D.append(mitemp2);
+                currentTemp++;
+                Integer x = currentTemp - 1;
+                String mitemp3 = "\nt" + currentTemp + " = " + idTemp + " < " + "t" + x;
+                cod3D.append(mitemp3);
+                cod3D.append("\nif " + "t" + currentTemp + " goto forBlock" + currentStruc);
+                cod3D.append("\nfor_end" + currentStruc + ":");
+                :}
+
+            | forStrucBegin3:expr1 DELIMETERBLOCK BLOCK DELIMETERBLOCK {:
+                String[] elementos1 = expr1.toString().split(":");
+                currentTemp++;
+                cod3D.append("\nfor_end_block" + currentStruc + ":");
+                String mitemp = "\nt" + currentTemp + " = " + elementos1[2];
+                cod3D.append(mitemp);
+                String idTemp = elementos1[0].toString();
+                cod3D.append("\n" + idTemp + " = t" + currentTemp + " + " + idTemp);
+                currentTemp++;
+                String mitemp2 = "\nt" + currentTemp + " = " + elementos1[1];
+                cod3D.append(mitemp2);
+                currentTemp++;
+                Integer x = currentTemp - 1;
+                String mitemp3 = "\nt" + currentTemp + " = " + idTemp + " < " + "t" + x;
+                cod3D.append(mitemp3);
+                cod3D.append("\nif " + "t" + currentTemp + " goto forBlock" + currentStruc);
+                cod3D.append("\nfor_end" + currentStruc + ":");:};
 
 
 //Declaracion de parametros
-paramStruc ::= PARAM SEP INT SEP IDENTIFIER:ID {:String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "INT"); :}
-        | PARAM SEP CHAR SEP IDENTIFIER:ID {:String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "CHAR"); :}
-        | PARAM SEP STRINGT SEP IDENTIFIER:ID {:String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "STRING"); :}
-        | PARAM SEP FLOAT SEP IDENTIFIER:ID {:String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "FLOAT"); :}
-        | PARAM SEP BOOL SEP IDENTIFIER:ID  {:String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "BOOL"); :}; 
+paramStruc ::= PARAM SEP INT SEP IDENTIFIER:ID {:
+                                                currentParam++;
+                                                cod3D.append("\nparam" + currentParam + " " + ID.toString());
+                                                String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "INT"); :}
+
+        | PARAM SEP CHAR SEP IDENTIFIER:ID {:
+                                                currentParam++;
+                                                cod3D.append("\nparam" + currentParam + " " + ID.toString());
+                                                String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "CHAR"); :}
+
+        | PARAM SEP STRINGT SEP IDENTIFIER:ID {:
+                                                currentParam++;
+                                                cod3D.append("\nparam" + currentParam + " " + ID.toString());
+                                                String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "STRING"); :}
+        | PARAM SEP FLOAT SEP IDENTIFIER:ID {:
+                                                currentParam++;
+                                                cod3D.append("\nparam" + currentParam + " " + ID.toString());
+                                                String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "FLOAT"); :}
+        | PARAM SEP BOOL SEP IDENTIFIER:ID  {:
+                                                currentParam++;
+                                                cod3D.append("\nparam" + currentParam + " " + ID.toString());
+                                                String tipo = getTipo(ID.toString()); RESULT = tipo; scopePrograma.get(currentHash).add("Instancia PARAM: " + ID.toString() + ":" + "BOOL"); :}; 
 
 paramList ::= paramStruc paramList
         | paramStruc;
 
 
-printStruc ::= PRINT PARENTS numbers PARENTC
-            | PRINT PARENTS IDENTIFIER PARENTC
-            | PRINT PARENTS STRING_LITERAL PARENTC;
+printStruc ::= PRINT PARENTS compAritOp:val PARENTC {: 
+                                                String[] elementos = val.toString().split(":");
+                                                if (elementos[1].equals("FLOAT")) 
+                                                {
+                                                    
+                                                    //cod3D.append("\nf" + currentFloat + " = " + elementos[0]);
+                                                    cod3D.append("\nprint f" + currentFloat);}
+                                                else {
+                                                    
+                                                    //cod3D.append("\nt" + currentTemp + " = " + elementos[0]);
+                                                    cod3D.append("\nprint t" + currentTemp);}; :};
 
 
-returnStruc ::=  RETURN:ss SEP exprP:val ENDEXPR {:
-                                                boolean valido = validarReturn(val.toString()); 
+returnStruc ::=  RETURN SEP exprP:val ENDEXPR {:
+                                                String[] elementos = val.toString().split(":");
+                                                boolean valido = validarReturn(elementos[1]); 
+                                                if (elementos[1].equals("FLOAT")) {cod3D.append("\nreturn f" + currentFloat);}
+                                                else {cod3D.append("\nreturn t" + currentTemp);};
+
                                                 if (!valido) {System.out.println("ERROR RETORNO -> Tipo de retorno distinto al de la funcion");}:}
         | RETURN ENDEXPR;
-
-//Manejo de errores
-
-error ::= 
-    error SEMI {: System.out.println("Error de sintaxis: se esperaba ; "); :}
-    | error ENDEXPR {: System.out.println("Error de sintaxis: se esperaba ; "); :}
-    | error SEP {: System.out.println("Error de sintaxis: se esperaba : "); :}
-    | error IDENTIFIER {: System.out.println("Error de sintaxis: se esperaba un identificador "); :}
-    | error PLUS {: System.out.println("Error de sintaxis: se esperaba + "); :}
-    | error MINUSW {: System.out.println("Error de sintaxis: se esperaba - "); :}
-    | error PRODUCT {: System.out.println("Error de sintaxis: se esperaba * "); :}
-    | error DIVISION {: System.out.println("Error de sintaxis: se esperaba / "); :}
-    | error POWER {: System.out.println("Error de sintaxis: se esperaba ^ "); :}
-    | error MODULUS {: System.out.println("Error de sintaxis: se esperaba % "); :}
-    | error STRINGT {: System.out.println("Error de sintaxis: se esperaba un string "); :}
-    | error EQ {: System.out.println("Error de sintaxis: se esperaba = "); :}
-    | error EQEQ {: System.out.println("Error de sintaxis: se esperaba == "); :}
-    | error ABSTRACT {: System.out.println("Error de sintaxis: se esperaba una expresion abstracta "); :}
-    | error BOOLEAN {: System.out.println("Error de sintaxis: se esperaba una expresion booleana "); :}
-    | error INT {: System.out.println("Error de sintaxis: se esperaba int "); :}
-    | error CHAR {: System.out.println("Error de sintaxis: se esperaba char "); :}
-    | error FLOAT {: System.out.println("Error de sintaxis: se esperaba float "); :}
-    | error BOOL {: System.out.println("Error de sintaxis: se esperaba bool "); :}
-    | error BREAK {: System.out.println("Error de sintaxis: se esperaba break "); :}
-    | error DOT {: System.out.println("Error de sintaxis: se esperaba . "); :}
-    | error INTEGER_LITERAL {: System.out.println("Error de sintaxis: La expresion no corresponde con un numero "); :}
-    | error FLOATNUM {: System.out.println("Error de sintaxis: La expresion debe ser un numero flotante "); :}
-    | error TRUE {: System.out.println("Error de sintaxis: se esperaba true "); :}
-    | error FALSE {: System.out.println("Error de sintaxis: se esperaba false "); :}
-    | error DELIMETERBLOCK {: System.out.println("Error de sintaxis: se esperaba _ "); :}
-    | error IF {: System.out.println("Error de sintaxis: se esperaba if "); :}
-    | error ELSE {: System.out.println("Error de sintaxis: se esperaba else "); :}
-    | error SWITCH {: System.out.println("Error de sintaxis: se esperaba switch "); :}
-    | error CASE {: System.out.println("Error de sintaxis: se esperaba case "); :}
-    | error FOR {: System.out.println("Error de sintaxis: se esperaba for "); :}
-    | error WHILE {: System.out.println("Error de sintaxis: se esperaba while "); :}
-    | error IN {: System.out.println("Error de sintaxis: se esperaba in "); :}
-    | error RANGE {: System.out.println("Error de sintaxis: se esperaba range "); :}
-    | error GRATHER {: System.out.println("Error de sintaxis: se esperaba > "); :}
-    | error LOWER {: System.out.println("Error de sintaxis: se esperaba < "); :}
-    | error GRATHERT {: System.out.println("Error de sintaxis: se esperaba >= "); :}
-    | error LOWERT {: System.out.println("Error de sintaxis: se esperaba <= "); :}
-    | error COMPARATION {: System.out.println("Error de sintaxis: se esperaba == "); :}
-    | error DIFF {: System.out.println("Error de sintaxis: se esperaba != "); :}
-    | error NEGATION {: System.out.println("Error de sintaxis: se esperaba ! "); :}
-    | error AND {: System.out.println("Error de sintaxis: se esperaba && "); :}
-    | error OR {: System.out.println("Error de sintaxis: se esperaba || "); :}
-    | error FUNC {: System.out.println("Error de sintaxis: se esperaba func "); :}
-    | error MAIN {: System.out.println("Error de sintaxis: se esperaba main "); :}
-    | error PARAM {: System.out.println("Error de sintaxis: se esperaba un parametro "); :}
-    | error PARENTS {: System.out.println("Error de sintaxis: se esperaba ( "); :}
-    | error PARENTC {: System.out.println("Error de sintaxis: se esperaba ) "); :}
-    | error SQUARES {: System.out.println("Error de sintaxis: se esperaba [ "); :}
-    | error SQUAREC {: System.out.println("Error de sintaxis: se esperaba ] "); :}
-    | error LOC {: System.out.println("Error de sintaxis: se esperaba loc "); :}
-    | error GLOB {: System.out.println("Error de sintaxis: se esperaba glob "); :}
-    | error RETURN {: System.out.println("Error de sintaxis: se esperaba return "); :}
-    | error DEFAULT {: System.out.println("Error de sintaxis: se esperaba default "); :}
-    | error BRAKE {: System.out.println("Error de sintaxis: se esperaba brake "); :}
-    | error PRINT {: System.out.println("Error de sintaxis: se esperaba print "); :}
-    | error INPUT {: System.out.println("Error de sintaxis: se esperaba input "); :};
-
 

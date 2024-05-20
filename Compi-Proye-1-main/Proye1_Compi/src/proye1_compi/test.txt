@@ -1,18 +1,23 @@
 glob:int:ss;
 glob:int:ss1;
-glob:int:array:xd1[11];
+glob:int:array:xd1[11]  = [1,2,2,2];
 glob:int:array:xd1[11];
 
 func:int:xd_
         loc:int:x22;
         param:int:xddd;
-        loc:int:var;
+        loc:int:var = 2;
+        loc:int:array:xd1[11] = [1];
         var = 2;
-        return:false||true;
+        return:2.0;
+        loc:float:var = 1.2;
         var--;
-        xd(xd, 12);
+        xd(xd);
         xd();
         xd1[12];
-        xd1= [12, var, 23];
+        print(xd);
+        for:i:in:range(12, 10, 3)_print(xd);_
+        if(2==2)_print(2);_else_print(2);_
+        while(2==2)_print(2);_
 _
 
