@@ -8,7 +8,7 @@ parser code {:
     // Connect this parser to a scanner!
     Lexer lex;
     HashMap<String, ArrayList<String>> scopePrograma = new HashMap<String, ArrayList<String>>();
-    String currentHash;
+    String currentHash = "a";
     String globalHash = "SCOPE GLOBAL";
 
     @SuppressWarnings("deprecation")
@@ -18,7 +18,10 @@ parser code {:
     }
 
     public boolean existeVar(String ID, String tipo) {
+        if (currentHash.equals("a")) {return false;}
+
         ArrayList<String> ts = scopePrograma.get(currentHash);
+
         String comparado = "Instancia loc: " + ID.toString() + ":" + tipo;
 
         for (String variable : ts) {
@@ -29,6 +32,7 @@ parser code {:
     }
 
     public boolean existeVarNoT(String ID) {
+        if (currentHash.equals("a")) {return false;}
         ArrayList<String> ts = scopePrograma.get(currentHash);
         ArrayList<String> ts2 = scopePrograma.get(globalHash);
         
@@ -47,13 +51,16 @@ parser code {:
     }
 
     public String getTipo(String ID) {
-        ArrayList<String> ts = scopePrograma.get(currentHash);
-        ArrayList<String> ts2 = scopePrograma.get(globalHash);
-
-        for (String variable : ts) {
+        if (!currentHash.equals("a")) {
+            ArrayList<String> ts = scopePrograma.get(currentHash);
+            
+            for (String variable : ts) {
             String[] elementosVar = variable.split(":");
             if (elementosVar[1].trim().equals(ID)) {return elementosVar[2];}
+            }
         }
+
+        ArrayList<String> ts2 = scopePrograma.get(globalHash);
 
         for (String variable : ts2) {
             String[] elementosVar = variable.split(":");
@@ -65,6 +72,7 @@ parser code {:
 
     public String getTipoFunc(String ID) {
         for (String key : scopePrograma.keySet()) {
+            
             ArrayList<String> value = scopePrograma.get(key);
             for (String elemento : value) {
                 String[] ts = elemento.split(":");
@@ -89,6 +97,7 @@ parser code {:
     }
 
     public boolean validarReturn(String tipo) {
+        if (currentHash.equals("a")) {return false;}
         ArrayList<String> ts = scopePrograma.get(currentHash);
         
         String[] elementos = ts.get(0).split(":");
@@ -147,6 +156,7 @@ parser code {:
     }
 
     public boolean existeArr(String ID, String tipo) {
+        if (currentHash.equals("a")) {return false;}
         ArrayList<String> ts = scopePrograma.get(currentHash);
         String comparado = "Instancia LOC ARR: " + ID.toString() + ":" + tipo;
 
@@ -159,6 +169,8 @@ parser code {:
     }
 
     public int countParam (String nombreFunc) {
+        if (scopePrograma.get(nombreFunc) == null) {return -1;}
+
         ArrayList<String> currentFunc = scopePrograma.get(nombreFunc);
         int cantParam = 0;
 
@@ -203,6 +215,11 @@ parser code {:
     Integer cantParams = 0;
     Integer currentParam = 0;
     Integer currentStruc = 0;
+    Integer casesCont = 0;
+    Integer casesContRes = 0;
+    Integer currentReturns = 0;
+    boolean breakSwitch = false;
+    String idSwitch;
     ArrayList<String> elementosArray = new ArrayList<>();
 :}
 
@@ -230,7 +247,7 @@ non terminal            expr_list;
 non terminal            Integer expr;// used to store evaluated subexpressions
 non terminal            SI, varIns, varAsig, BLOCK, compAritOp, factor, term, funcStruc, mainStruc, types, printStruc;
 non terminal            ifStruc, ifElseStruc, whileStruc, arrayIns, arrayAsig, arrayInsAsign, elementos, switchStruc, caseStruc, forStruc, numbers;
-non terminal            forStrucBegin3, forStrucBegin2, forStrucBegin, whileBegin, elseStruc, ifStrucComplete, returnStruc, inputStruc, mainInitial, funInitial, exprP, exprLog, exprUni, opRel, opLog, arrayElement, paramStruc, paramList, paramFunc, funcInvo, GEN, arrayInsGl, varInsGl, varInsAsig, varInsAsigGl, arrayInsAsignGl;
+non terminal            caseMid, caseStrucBegin, defaultStruc, switchBegin, forStrucBegin3, forStrucBegin2, forStrucBegin, whileBegin, elseStruc, ifStrucComplete, returnStruc, inputStruc, mainInitial, funInitial, exprP, exprLog, exprUni, opRel, opLog, arrayElement, paramStruc, paramList, paramFunc, funcInvo, GEN, arrayInsGl, varInsGl, varInsAsig, varInsAsigGl, arrayInsAsignGl;
 
 /* Orden de precedencia */
 precedence left PLUS, MINUSW;
@@ -269,7 +286,8 @@ BLOCK ::= BLOCK exprP ENDEXPR
         | BLOCK varInsAsig 
         | BLOCK arrayInsAsign
         | BLOCK printStruc ENDEXPR
-        | BLOCK BREAK ENDEXPR
+        | BLOCK BREAK ENDEXPR {:if(breakSwitch) {cod3D.append("\ngoto endSwitchStruc" + currentStruc);}
+                                :}
         | BLOCK inputStruc
         | BLOCK arrayAsig
         | BLOCK returnStruc
@@ -293,7 +311,7 @@ BLOCK ::= BLOCK exprP ENDEXPR
         | whileStruc
         | returnStruc
         | printStruc ENDEXPR
-        | BREAK ENDEXPR
+        | BREAK ENDEXPR {:if(breakSwitch) {cod3D.append("\ngoto endSwitchStruc" + currentStruc);}:}
         | inputStruc
         | error;
 
@@ -422,11 +440,13 @@ factor     ::= numbers:numero {:
                 if (elementos[1].equals("FLOAT")) {   
                     currentFloat++;             
                     String miTempId = "f"+currentFloat;
-                    cod3D.append("\n" +  miTempId + "=" + elementos[0]);}
+                    cod3D.append("\n" +  miTempId + "=" + elementos[0])
+                    ;}
                 else {    
                     currentTemp++;            
                     String miTempId = "t"+currentTemp;
-                    cod3D.append("\n" +  miTempId + "=" + elementos[0]);}
+                    cod3D.append("\n" +  miTempId + "=" + elementos[0])
+                    ;}
 
                 RESULT = numero;:}
 
@@ -591,10 +611,10 @@ varAsig      ::=  IDENTIFIER:ID EQ exprP:val ENDEXPR  {:
                                                     if (!existe && !existe2) {System.out.println("Esta variable -> " + ID.toString() + " <- no existe");}
                                                     String[] valores = val.toString().split(":");
                                                     
-                                                    currentTemp++;
+                                                    //currentTemp++;
                                                     String baseTemp = "t";
                                                     if (tipo.equals("FLOAT")) {baseTemp = "f";}
-                                                    cod3D.append("\n" + baseTemp + currentTemp + " = " + valores[0]);
+                                                    //cod3D.append("\n" + baseTemp + currentTemp + " = " + valores[0]);
                                                     cod3D.append("\n" + ID.toString() + " = " + baseTemp + currentTemp);
 
                                                     if(!tipo.equals(valores[1])) {System.out.println("Error semantico, el tipo de la variable no coincide con el asignado");} else {RESULT = tipo;}:}
@@ -722,6 +742,7 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             currentTemp = 0;
                                                             currentFloat = 0;
                                                             currentParam = 0;
+                                                            currentReturns = 0;
 
                                                             RESULT = "INT";
                         :}
@@ -739,6 +760,7 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             currentTemp = 0;
                                                             currentFloat = 0;
                                                             currentParam = 0;
+                                                            currentReturns = 0;
 
                                                             RESULT = "CHAR";
                         :}
@@ -756,6 +778,7 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             currentTemp = 0;
                                                             currentFloat = 0;
                                                             currentParam = 0;
+                                                            currentReturns = 0;
 
                                                             RESULT = "BOOL";
                         :}
@@ -773,6 +796,7 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             currentTemp = 0;
                                                             currentFloat = 0;
                                                             currentParam = 0;
+                                                            currentReturns = 0;
 
                                                             RESULT = "STRING";
                         :}
@@ -790,12 +814,13 @@ funInitial   ::= FUNC SEP INT SEP IDENTIFIER:ID
                                                             currentTemp = 0;
                                                             currentFloat = 0;
                                                             currentParam = 0;
+                                                            currentReturns = 0;
 
                                                             RESULT = "FLOAT";
                         :};
 
 //Declaracion inicial del bloque para las funciones
-funcStruc    ::= funInitial DELIMETERBLOCK BLOCK DELIMETERBLOCK;  
+funcStruc    ::= funInitial DELIMETERBLOCK BLOCK DELIMETERBLOCK {:if (currentReturns.equals(0)) {System.out.println("ERROR -> Las funciones deben tener al menos un retorno");}:};  
 
 mainInitial  ::= FUNC SEP INT SEP MAIN 
                         {:                              
@@ -810,26 +835,26 @@ mainInitial  ::= FUNC SEP INT SEP MAIN
                                                         currentTemp = 0;
                                                         currentFloat = 0;
                                                         currentParam = 0;
+                                                        currentReturns = 0;
 
                                                         scopePrograma.put(currentHash, fun);
                             :};
 
-mainStruc    ::= mainInitial DELIMETERBLOCK BLOCK DELIMETERBLOCK;
+mainStruc    ::= mainInitial DELIMETERBLOCK BLOCK DELIMETERBLOCK {: if (currentReturns.equals(0)) {System.out.println("ERROR -> Las funciones deben tener al menos un retorno");} :};
 
 paramFunc    ::= exprP COMA paramFunc {: cantParams++; :}
                 | exprP {: cantParams++; :};
 
 funcInvo     ::= IDENTIFIER:ID PARENTS paramFunc PARENTC {: 
                                                             String tipo = getTipoFunc(ID.toString()); 
+                                                            boolean existe = existeFun(ID.toString(), tipo);
+                                                            if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");}
                                                             currentTemp++;
                                                             String baseTemp = "t";
                                                             if (tipo.equals("FLOAT")) {baseTemp = "f";}
                                                             
                                                             cod3D.append("\n" + baseTemp + currentTemp + "= call " + ID.toString() + ", " + cantParams);
                                                             
-                                                            
-                                                            boolean existe = existeFun(ID.toString(), tipo);
-                                                            if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");}
                                                             Integer numberOfParams = countParam(ID.toString());
                                                             if (!numberOfParams.equals(cantParams)) {System.out.println("ERROR -> La cantidad de parametros enviados no coincide con los esperados por la funcion");}
                                                             cantParams = 0;
@@ -955,10 +980,62 @@ arrayElement ::= IDENTIFIER:ID SQUARES INTEGER_LITERAL:lit SQUAREC {: currentTem
 
 
 //Declaracion de switch
-switchStruc ::= SWITCH PARENTS IDENTIFIER PARENTC DELIMETERBLOCK caseStruc DEFAULT SEP BLOCK DELIMETERBLOCK {:System.out.println("Se declaro estructura switch");:};
-caseStruc ::= CASE SEP compAritOp SEP BLOCK caseStruc
-            | CASE SEP compAritOp SEP BLOCK;
+switchBegin ::= {: 
+                breakSwitch = true;
+                currentStruc++;
+                casesCont = 0;
+                casesContRes = 0;
+                cod3D.append("\nswitchBegin" + currentStruc + ":");
+                String mitemp1 = "\nlocal_data_int flag";
+                cod3D.append(mitemp1);
+                cod3D.append("\nflag = 1");
+                :}
+                SWITCH PARENTS IDENTIFIER:ID PARENTC {: idSwitch = ID.toString(); :};
+switchStruc ::= switchBegin DELIMETERBLOCK caseStruc defaultStruc DELIMETERBLOCK {:cod3D.append("\nendSwitchStruc" + currentStruc + ":"); breakSwitch = false;:};
 
+caseStrucBegin ::= CASE SEP compAritOp:val SEP{:
+            casesCont++;
+            cod3D.append("\ncaseCond" + casesCont + ":");
+            cod3D.append("\nif flag == 1 goto caseBlockEntry" + casesCont);
+            cod3D.append("\ngoto caseEndBlock" + casesCont);
+
+            String tipo = getTipo(idSwitch);
+            String[] elementos = val.toString().split(":");
+            if (!tipo.equals(elementos[1])) {System.out.println("ERROR: El valor del case no es igual al de la variable a comparar");}
+
+            cod3D.append("\ncaseBlockEntry" + casesCont + ":");
+            cod3D.append("\nif " + idSwitch + " == " + elementos[0] + " goto caseBlock" + casesCont);
+            cod3D.append("\ngoto caseEndBlock" + casesCont);
+            cod3D.append("\ncaseBlock" + casesCont + ":");
+            cod3D.append("\nflag = 0");
+            :};
+
+caseMid ::= BLOCK {:
+                    Integer x = casesCont + 1;
+                    cod3D.append("\ngoto caseBlock" + x);:};
+
+caseStruc ::= 
+            caseStrucBegin caseMid caseStruc {:
+            Integer x = casesCont - casesContRes;
+            Integer y = x + 1;
+
+            cod3D.append("\ncaseEndBlock" + x + ":");
+            cod3D.append("\ngoto caseCond" + y);
+            casesContRes++;
+            :}
+            | caseStrucBegin BLOCK {:
+            Integer x = casesCont - casesContRes;
+            
+            cod3D.append("\ncaseEndBlock" + x + ":");
+            cod3D.append("\ngoto defaultBlock");
+            casesContRes++;
+            :};
+
+defaultStruc ::= {:cod3D.append("\ndefaultBlock" + casesCont + ":");
+                :} 
+                DEFAULT SEP BLOCK {:
+                cod3D.append("\ndefaultEndBlock" + casesCont + ":");
+                cod3D.append("\ngoto endSwitchStruc" + casesCont);:};
 
 //Declaracion de FOR
 forStrucBegin ::= FOR SEP IDENTIFIER:val SEP IN SEP RANGE PARENTS exprP:expr1 PARENTC {: 
@@ -1137,6 +1214,7 @@ returnStruc ::=  RETURN SEP exprP:val ENDEXPR {:
                                                 boolean valido = validarReturn(elementos[1]); 
                                                 if (elementos[1].equals("FLOAT")) {cod3D.append("\nreturn f" + currentFloat);}
                                                 else {cod3D.append("\nreturn t" + currentTemp);};
+                                                currentReturns++;
 
                                                 if (!valido) {System.out.println("ERROR RETORNO -> Tipo de retorno distinto al de la funcion");}:}
         | RETURN ENDEXPR;
