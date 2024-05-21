@@ -9,6 +9,11 @@ import java_cup.runtime.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java_cup.runtime.XMLElement;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
@@ -1286,6 +1291,15 @@ return lex.next_token();
         return false;
     }
 
+    public static void WriteToFile(String filename, String content) throws IOException {
+        FileWriter writer = new FileWriter(filename);
+        // Escribir contenido en el archivo
+        writer.write(content);
+        // Es importante cerrar el escritor después de haber terminado de escribir
+        writer.close();
+        System.out.println("El archivo se ha escrito correctamente.\n");
+    }    
+
     public boolean existeVarNoT(String ID) {
         if (currentHash.equals("a")) {return false;}
         ArrayList<String> ts = scopePrograma.get(currentHash);
@@ -1531,7 +1545,7 @@ class CUP$Parser$actions {
               Object RESULT =null;
               // propagate RESULT from NT$0
                 RESULT = (Object) ((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
-		 System.out.println(cod3D.toString()); 
+		 System.out.println(cod3D.toString()); WriteToFile("3Dcode.txt", cod3D.toString()); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("SI",2, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;

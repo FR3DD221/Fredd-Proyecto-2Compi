@@ -8,7 +8,7 @@ func:int:xd_
         loc:int:var = 2;
         for:i:in:range(12, 10, 3)_print(xd);_
         if(2==2)_print(2);_else_print(2);_
-        while(2==2)_print(2);_
+        
         return:5;
 _
 
