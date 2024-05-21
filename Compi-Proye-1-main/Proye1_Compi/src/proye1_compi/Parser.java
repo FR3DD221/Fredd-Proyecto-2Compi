@@ -2117,7 +2117,7 @@ class CUP$Parser$actions {
 		 
                                                 String[] elementos1 = op1.toString().split(":");
                                                 String[] elementos2 = op2.toString().split(":");
-                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en esta suma los operadores deben ser del mismo tipo");} else 
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en esta suma los operadores deben ser del mismo tipo"); System.exit(0);} else 
                                                 {String baseTemp = "t";
                                                     String miTempId;
 
@@ -2149,7 +2149,7 @@ class CUP$Parser$actions {
 		 
                                                 String[] elementos1 = op1.toString().split(":");
                                                 String[] elementos2 = op2.toString().split(":");
-                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en esta resta los operadores deben ser del mismo tipo");} 
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en esta resta los operadores deben ser del mismo tipo");System.exit(0);} 
                                                 else {
                                                     String baseTemp = "t";
                                                     String miTempId;
@@ -2194,7 +2194,7 @@ class CUP$Parser$actions {
 		 
                                                 String[] elementos1 = op1.toString().split(":");
                                                 String[] elementos2 = op2.toString().split(":");
-                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en este producto los operadores deben ser del mismo tipo");} else 
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en este producto los operadores deben ser del mismo tipo");System.exit(0);} else 
                                                 {String baseTemp = "t";
                                                     String miTempId;
 
@@ -2226,7 +2226,7 @@ class CUP$Parser$actions {
 		 
                                                 String[] elementos1 = op1.toString().split(":");
                                                 String[] elementos2 = op2.toString().split(":");
-                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en este cociente los operadores deben ser del mismo tipo");} 
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en este cociente los operadores deben ser del mismo tipo");System.exit(0);} 
                                                 else {String baseTemp = "t";
                                                     String miTempId;
 
@@ -2258,7 +2258,7 @@ class CUP$Parser$actions {
 		 
                                                 String[] elementos1 = op1.toString().split(":");
                                                 String[] elementos2 = op2.toString().split(":");
-                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en esta potencia los operadores deben ser del mismo tipo");} else 
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en esta potencia los operadores deben ser del mismo tipo");System.exit(0);} else 
                                                 {String baseTemp = "t";
                                                     String miTempId;
 
@@ -2290,7 +2290,7 @@ class CUP$Parser$actions {
 		 
                                                 String[] elementos1 = op1.toString().split(":");
                                                 String[] elementos2 = op2.toString().split(":");
-                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en este modulo los operadores deben ser del mismo tipo");} else 
+                                                if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error semantico, en este modulo los operadores deben ser del mismo tipo");System.exit(0);} else 
                                                 {String baseTemp = "t";
                                                     String miTempId;
 
@@ -2532,7 +2532,17 @@ class CUP$Parser$actions {
           case 84: // inputStruc ::= INPUT PARENTS IDENTIFIER PARENTC ENDEXPR 
             {
               Object RESULT =null;
-		
+		int IDleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).left;
+		int IDright = ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)).right;
+		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-2)).value;
+		 
+                    String tipo = getTipo(ID.toString());
+                    boolean existe = existeVar(ID.toString(), tipo);
+                    boolean existe2 = existeVarGlob(ID.toString(), tipo);
+
+                    if (!existe && !existe2) {System.out.println("ERROR -> La variable debe estar declarada antes de usarse en el input");System.exit(0);}
+
+                    cod3D.append("\n" + ID.toString() + " = call input");
                 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("inputStruc",35, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -2591,7 +2601,7 @@ class CUP$Parser$actions {
                                                     String[] elementos1 = op1.toString().split(":");
                                                     String[] elementos2 = op2.toString().split(":");
 
-                                                    if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error, la comparacion debe ser entre valores del mismo tipo"); RESULT = elementos1[0] + ":" + "NULL";} else 
+                                                    if(!elementos1[1].equals(elementos2[1])) {System.out.println("Error, la comparacion debe ser entre valores del mismo tipo"); System.exit(0); RESULT = elementos1[0] + ":" + "NULL";} else 
                                                     {
                                                     String baseTemp = "t";
                                                     if (elementos1[1].equals("FLOAT")) {baseTemp = "f";}
@@ -2679,7 +2689,7 @@ class CUP$Parser$actions {
 
                                                 RESULT = baseTemp + currentTemp + ":" + "BOOL";} 
 
-                                            else {System.out.println("Ambos operadores deben ser booleanos"); RESULT = elementos1[0] + ":" + "NULL";}
+                                            else {System.out.println("Ambos operadores deben ser booleanos");System.exit(0); RESULT = elementos1[0] + ":" + "NULL";}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("exprUni",40, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2715,7 +2725,7 @@ class CUP$Parser$actions {
                                                 cod3D.append("\n" + miTempId3);
 
                                                 RESULT = baseTemp + currentTemp + ":" + "BOOL";} 
-                                            else {System.out.println("Ambos operadores deben ser booleanos"); RESULT = elementos1[0] + ":" + "NULL";} 
+                                            else {System.out.println("Ambos operadores deben ser booleanos");System.exit(0); RESULT = elementos1[0] + ":" + "NULL";} 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("exprUni",40, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2824,7 +2834,7 @@ class CUP$Parser$actions {
                                                     String tipo = getTipo(ID.toString());
                                                     boolean existe = existeVar(ID.toString(), tipo);
                                                     boolean existe2 = existeVarGlob(ID.toString(), tipo);
-                                                    if (!existe && !existe2) {System.out.println("Esta variable -> " + ID.toString() + " <- no existe");}
+                                                    if (!existe && !existe2) {System.out.println("Esta variable -> " + ID.toString() + " <- no existe");System.exit(0);}
                                                     String[] valores = val.toString().split(":");
                                                     
                                                     //currentTemp++;
@@ -2833,7 +2843,7 @@ class CUP$Parser$actions {
                                                     //cod3D.append("\n" + baseTemp + currentTemp + " = " + valores[0]);
                                                     cod3D.append("\n" + ID.toString() + " = " + baseTemp + currentTemp);
 
-                                                    if(!tipo.equals(valores[1])) {System.out.println("Error semantico, el tipo de la variable no coincide con el asignado");} else {RESULT = tipo;}
+                                                    if(!tipo.equals(valores[1])) {System.out.println("Error semantico, el tipo de la variable no coincide con el asignado");System.exit(0);} else {RESULT = tipo;}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varAsig",4, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -2860,7 +2870,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
                                                     boolean existe = existeVar(ID.toString(), "INT");
-                                                    if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
+                                                    if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");System.exit(0);}  
                                                     scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "INT");  
 
                                                     cod3D.append("\nlocal_data_int " + ID.toString());
@@ -2879,7 +2889,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 
                                                     boolean existe = existeVar(ID.toString(), "CHAR");
-                                                    if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
+                                                    if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");System.exit(0);}  
                                                     scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "CHAR");  
 
                                                     cod3D.append("\nlocal_data_char " + ID.toString());
@@ -2898,7 +2908,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 
                                                     boolean existe = existeVar(ID.toString(), "FLOAT");
-                                                    if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");} 
+                                                    if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");System.exit(0);} 
                                                     scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "FLOAT");  
 
                                                     cod3D.append("\nlocal_data_float " + ID.toString());
@@ -2917,7 +2927,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 
                                                     boolean existe = existeVar(ID.toString(), "BOOL");
-                                                    if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");}  
+                                                    if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");System.exit(0);}  
                                                     scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "BOOL");  
 
                                                     cod3D.append("\nlocal_data_bool " + ID.toString());
@@ -2936,7 +2946,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 
                                                     boolean existe = existeVar(ID.toString(), "STRING");
-                                                    if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");} 
+                                                    if (existe) {System.out.println("La variable local -> " + ID.toString() + " <- ya fue declarada");System.exit(0);} 
                                                     scopePrograma.get(currentHash).add("Instancia loc: " + ID.toString() + ":" + "STRING"); 
 
                                                     cod3D.append("\nlocal_data_string " + ID.toString());
@@ -2955,7 +2965,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 
                                                         boolean existe = existeVarGlob(ID.toString(), "INT");
-                                                        if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
+                                                        if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");System.exit(0);}
                                                         scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "INT"); 
 
                                                         cod3D.append("\nglobal_data_int " + ID.toString());
@@ -2974,7 +2984,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		          
                                                         boolean existe = existeVarGlob(ID.toString(), "CHAR");
-                                                        if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");} 
+                                                        if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");System.exit(0);} 
                                                         scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "CHAR");
 
                                                         cod3D.append("\nglobal_data_char " + ID.toString());
@@ -2993,7 +3003,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
                                                         boolean existe = existeVarGlob(ID.toString(), "FLOAT");
-                                                        if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
+                                                        if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");System.exit(0);}
                                                         scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "FLOAT"); 
 
                                                         cod3D.append("\nglobal_data_float " + ID.toString());
@@ -3012,7 +3022,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
                                                         boolean existe = existeVarGlob(ID.toString(), "STRING");
-                                                        if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
+                                                        if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");System.exit(0);}
                                                         scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "STRING"); 
 
                                                         cod3D.append("\nglobal_data_string " + ID.toString());
@@ -3031,7 +3041,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		 
                                                         boolean existe = existeVarGlob(ID.toString(), "BOOL");
-                                                        if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");}
+                                                        if (existe) {System.out.println("La variable global -> " + ID.toString() + " <- ya fue declarada");System.exit(0);}
                                                         scopePrograma.get(globalHash).add("Instancia GLOB: " + ID.toString() + ":" + "BOOL"); 
 
                                                         cod3D.append("\nglobal_data_bool " + ID.toString());
@@ -3060,7 +3070,7 @@ class CUP$Parser$actions {
                                         
                                         cod3D.append("\n" + valores1[0] + " = " + baseTemp + currentTemp);
 
-                                        if (!valores1[1].equals(valores2[1])) {System.out.println("ERROR VAR LOCAL-> El tipo de variable no coincide con el asignado");}
+                                        if (!valores1[1].equals(valores2[1])) {System.out.println("ERROR VAR LOCAL-> El tipo de variable no coincide con el asignado");System.exit(0);}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varInsAsig",51, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -3083,7 +3093,7 @@ class CUP$Parser$actions {
                                         
                                         cod3D.append("\n" + valores1[0] + " = " + baseTemp + currentTemp);
 
-                                        if (!valores1[1].equals(valores2[1])) {System.out.println("ERROR VAR GLOB-> El tipo de variable no coincide con el asignado");}
+                                        if (!valores1[1].equals(valores2[1])) {System.out.println("ERROR VAR GLOB-> El tipo de variable no coincide con el asignado");System.exit(0);}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("varInsAsigGl",52, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -3097,7 +3107,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		   String tipo;
                                                             boolean existe = existeFun(ID.toString(), "INT");
-                                                            if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
+                                                            if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");System.exit(0);} 
                                                             tipo = "tipo:func:INT";
                                                             ArrayList<String> fun = new ArrayList<String>();
                                                             currentHash = ID.toString();
@@ -3125,7 +3135,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		   String tipo;
                                                             boolean existe = existeFun(ID.toString(), "CHAR");
-                                                            if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
+                                                            if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");System.exit(0);} 
                                                             tipo = "tipo:func:CHAR";
                                                             ArrayList<String> fun = new ArrayList<String>();
                                                             currentHash = ID.toString();
@@ -3153,7 +3163,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		   String tipo;
                                                             boolean existe = existeFun(ID.toString(), "BOOL");
-                                                            if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
+                                                            if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");System.exit(0);} 
                                                             tipo = "tipo:func:BOOL";
                                                             ArrayList<String> fun = new ArrayList<String>();
                                                             currentHash = ID.toString();
@@ -3181,7 +3191,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		   String tipo;
                                                             boolean existe = existeFun(ID.toString(), "STRING");
-                                                            if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
+                                                            if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");System.exit(0);} 
                                                             tipo = "tipo:func:STRING";
                                                             ArrayList<String> fun = new ArrayList<String>();
                                                             currentHash = ID.toString();
@@ -3209,7 +3219,7 @@ class CUP$Parser$actions {
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		   String tipo;
                                                             boolean existe = existeFun(ID.toString(), "FLOAT");
-                                                            if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");} 
+                                                            if (existe) {System.out.println("La funcion -> " + ID.toString() + " <- ya fue declarada");System.exit(0);} 
                                                             tipo = "tipo:func:FLOAT";
                                                             ArrayList<String> fun = new ArrayList<String>();
                                                             currentHash = ID.toString();
@@ -3232,7 +3242,7 @@ class CUP$Parser$actions {
           case 124: // funcStruc ::= funInitial DELIMETERBLOCK BLOCK DELIMETERBLOCK 
             {
               Object RESULT =null;
-		if (currentReturns.equals(0)) {System.out.println("ERROR -> Las funciones deben tener al menos un retorno");}
+		if (currentReturns.equals(0)) {System.out.println("ERROR -> Las funciones deben tener al menos un retorno");System.exit(0);}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("funcStruc",9, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -3242,7 +3252,7 @@ class CUP$Parser$actions {
             {
               Object RESULT =null;
 		                              
-                                                        if (scopePrograma.get("MAIN") != null) {System.out.println("Ya existe una funcion main");}
+                                                        if (scopePrograma.get("MAIN") != null) {System.out.println("Ya existe una funcion main");System.exit(0);}
                                                         String tipo;
                                                         tipo = "tipo:MAIN:INT";
                                                         ArrayList<String> fun = new ArrayList<String>();
@@ -3265,7 +3275,7 @@ class CUP$Parser$actions {
           case 126: // mainStruc ::= mainInitial DELIMETERBLOCK BLOCK DELIMETERBLOCK 
             {
               Object RESULT =null;
-		 if (currentReturns.equals(0)) {System.out.println("ERROR -> Las funciones deben tener al menos un retorno");} 
+		 if (currentReturns.equals(0)) {System.out.println("ERROR -> Las funciones deben tener al menos un retorno");System.exit(0);} 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("mainStruc",10, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -3298,7 +3308,7 @@ class CUP$Parser$actions {
 		 
                                                             String tipo = getTipoFunc(ID.toString()); 
                                                             boolean existe = existeFun(ID.toString(), tipo);
-                                                            if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");}
+                                                            if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");System.exit(0);}
                                                             currentTemp++;
                                                             String baseTemp = "t";
                                                             if (tipo.equals("FLOAT")) {baseTemp = "f";}
@@ -3306,7 +3316,7 @@ class CUP$Parser$actions {
                                                             cod3D.append("\n" + baseTemp + currentTemp + "= call " + ID.toString() + ", " + cantParams);
                                                             
                                                             Integer numberOfParams = countParam(ID.toString());
-                                                            if (!numberOfParams.equals(cantParams)) {System.out.println("ERROR -> La cantidad de parametros enviados no coincide con los esperados por la funcion");}
+                                                            if (!numberOfParams.equals(cantParams)) {System.out.println("ERROR -> La cantidad de parametros enviados no coincide con los esperados por la funcion");System.exit(0);}
                                                             cantParams = 0;
 
                                                             RESULT = tipo; 
@@ -3328,9 +3338,9 @@ class CUP$Parser$actions {
                                                             
                                                             cod3D.append("\n" + baseTemp + currentTemp + "= call " + ID.toString() + ", " + cantParams);
                                                             boolean existe = existeFun(ID.toString(), tipo);
-                                                            if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");}
+                                                            if (!existe) {System.out.println("ERROR -> La funcion llamada no ha sido declarada");System.exit(0);}
                                                             Integer numberOfParams = countParam(ID.toString());
-                                                            if (!numberOfParams.equals(0)) {System.out.println("ERROR -> La cantidad de parametros enviados no coincide con los esperados por la funcion");}
+                                                            if (!numberOfParams.equals(0)) {System.out.println("ERROR -> La cantidad de parametros enviados no coincide con los esperados por la funcion");System.exit(0);}
                                                             RESULT = tipo; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("funcInvo",47, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-2)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -3453,7 +3463,7 @@ currentStruc++;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
 		 
                                                                                         boolean existe = existeArr(ID.toString(), "INT");
-                                                                                        if (existe) {System.out.println("El array local -> " + ID.toString() + " <- ya fue declarado");}  
+                                                                                        if (existe) {System.out.println("El array local -> " + ID.toString() + " <- ya fue declarado");System.exit(0);}  
                                                                                         scopePrograma.get(currentHash).add("Instancia LOC ARR: " + ID.toString() + ":" + "INT"); 
                                                                                         cod3D.append("\nlocal_data_arr_int " + ID.toString());
 
@@ -3471,7 +3481,7 @@ currentStruc++;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
 		 
                                                                                         boolean existe = existeArr(ID.toString(), "CHAR");
-                                                                                        if (existe) {System.out.println("El array local -> " + ID.toString() + " <- ya fue declarado");}
+                                                                                        if (existe) {System.out.println("El array local -> " + ID.toString() + " <- ya fue declarado");System.exit(0);}
                                                                                         scopePrograma.get(currentHash).add("Instancia LOC ARR: " + ID.toString() + ":" + "CHAR"); 
                                                                                         cod3D.append("\nlocal_data_arr_char " + ID.toString());
 
@@ -3489,7 +3499,7 @@ currentStruc++;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
 		 
                                                                                         boolean existe = existeArrGlob(ID.toString(), "INT");
-                                                                                        if (existe) {System.out.println("El array global -> " + ID.toString() + " <- ya fue declarado");}
+                                                                                        if (existe) {System.out.println("El array global -> " + ID.toString() + " <- ya fue declarado");System.exit(0);}
                                                                                         scopePrograma.get(globalHash).add("Instancia GLOB ARR: " + ID.toString() + ":" + "INT"); 
                                                                                         cod3D.append("\nglobal_data_arr_int " + ID.toString());
 
@@ -3507,7 +3517,7 @@ currentStruc++;
 		Object ID = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-3)).value;
 		 
                                                                                         boolean existe = existeArrGlob(ID.toString(), "CHAR");
-                                                                                        if (existe) {System.out.println("El array global -> " + ID.toString() + " <- ya fue declarado");}
+                                                                                        if (existe) {System.out.println("El array global -> " + ID.toString() + " <- ya fue declarado");System.exit(0);}
                                                                                         scopePrograma.get(globalHash).add("Instancia GLOB ARR: " + ID.toString() + ":" + "CHAR"); 
                                                                                         cod3D.append("\nglobal_data_arr_char " + ID.toString());
 
@@ -3530,7 +3540,7 @@ currentStruc++;
                                                                         if (!existe && !existe2) {System.out.println("Este array -> " + ID.toString() + " <- no existe");}
                                                                         writeAsignArr(ID.toString());
 
-                                                                        if (!todosIguales(elementosArray)) {System.out.println("Los elementos asignados deben coincidir en tipo entre ellos y de acuerdo al arreglo");}
+                                                                        if (!todosIguales(elementosArray)) {System.out.println("Los elementos asignados deben coincidir en tipo entre ellos y de acuerdo al arreglo");System.exit(0);}
                                                                         elementosArray.clear();
                                                                         RESULT = ID.toString() + ":" + tipo;
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("arrayAsig",17, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-5)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
@@ -3591,10 +3601,10 @@ currentStruc++;
 		Object t2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
                                             String[] elementos1 = t1.toString().split(":");
-                                            if (!todosIguales(elementosArray)) {System.out.println("Los elementos asignados deben coincidir en tipo entre ellos y de acuerdo al arreglo");}
+                                            if (!todosIguales(elementosArray)) {System.out.println("Los elementos asignados deben coincidir en tipo entre ellos y de acuerdo al arreglo");System.exit(0);}
                                             String tipo = elementosArray.get(0);
                                             writeAsignArr(elementos1[0]);
-                                            if (!elementos1[1].equals(tipo)) {System.out.println("ERROR ARRAY LOC -> No todos los valores coinciden con el tipo instanciado");};
+                                            if (!elementos1[1].equals(tipo)) {System.out.println("ERROR ARRAY LOC -> No todos los valores coinciden con el tipo instanciado");System.exit(0);};
                                             elementosArray.clear();
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("arrayInsAsign",18, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -3612,10 +3622,10 @@ currentStruc++;
 		Object t2 = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
                                             String[] elementos1 = t1.toString().split(":");
-                                            if (!todosIguales(elementosArray)) {System.out.println("Los elementos asignados deben coincidir en tipo entre ellos y de acuerdo al arreglo");}
+                                            if (!todosIguales(elementosArray)) {System.out.println("Los elementos asignados deben coincidir en tipo entre ellos y de acuerdo al arreglo");System.exit(0);}
                                             String tipo = elementosArray.get(0);
                                             writeAsignArr(elementos1[0]);
-                                            if (!elementos1[1].equals(tipo)) {System.out.println("ERROR ARRAY GLOB -> No todos los valores coinciden con el tipo instanciado");}
+                                            if (!elementos1[1].equals(tipo)) {System.out.println("ERROR ARRAY GLOB -> No todos los valores coinciden con el tipo instanciado");System.exit(0);}
                                             elementosArray.clear();
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("arrayInsAsignGl",53, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -3694,7 +3704,7 @@ currentStruc++;
 
             String tipo = getTipo(idSwitch);
             String[] elementos = val.toString().split(":");
-            if (!tipo.equals(elementos[1])) {System.out.println("ERROR: El valor del case no es igual al de la variable a comparar");}
+            if (!tipo.equals(elementos[1])) {System.out.println("ERROR: El valor del case no es igual al de la variable a comparar");System.exit(0);}
 
             cod3D.append("\ncaseBlockEntry" + casesCont + ":");
             cod3D.append("\nif " + idSwitch + " == " + elementos[0] + " goto caseBlock" + casesCont);
@@ -3784,7 +3794,7 @@ cod3D.append("\ndefaultBlock" + casesCont + ":");
 		 
                                             currentStruc++;  
                                             String[] elementos1 = expr1.toString().split(":");
-                                            if(!elementos1[1].equals("INT")) {System.out.println("ERROR SEMANTICO -> Los parametros del range deben ser de tipo entero");}
+                                            if(!elementos1[1].equals("INT")) {System.out.println("ERROR SEMANTICO -> Los parametros del range deben ser de tipo entero");System.exit(0);}
                                             
                                             cod3D.append("\nfor_begin" + currentStruc + ":");
                                             String mitemp1 = "local_data_int " + val.toString();
@@ -3824,7 +3834,7 @@ cod3D.append("\ndefaultBlock" + casesCont + ":");
                                             String[] elementos1 = expr1.toString().split(":");
                                             String[] elementos2 = expr2.toString().split(":");
                                             currentStruc++; 
-                                            if(!elementos1[1].equals("INT") || !elementos2[1].equals("INT")) {System.out.println("ERROR SEMANTICO -> Los parametros del range deben ser de tipo entero");}
+                                            if(!elementos1[1].equals("INT") || !elementos2[1].equals("INT")) {System.out.println("ERROR SEMANTICO -> Los parametros del range deben ser de tipo entero");System.exit(0);}
 
                                             cod3D.append("\nfor_begin" + currentStruc + ":");
                                             String mitemp1 = "local_data_int " + val.toString();
@@ -3868,7 +3878,7 @@ cod3D.append("\ndefaultBlock" + casesCont + ":");
                                             String[] elementos2 = expr2.toString().split(":");
                                             String[] elementos3 = expr3.toString().split(":");
                                             currentStruc++;
-                                            if(!elementos1[1].equals("INT") || !elementos2[1].equals("INT") || !elementos3[1].equals("INT")) {System.out.println("ERROR SEMANTICO -> Los parametros del range deben ser de tipo entero");} 
+                                            if(!elementos1[1].equals("INT") || !elementos2[1].equals("INT") || !elementos3[1].equals("INT")) {System.out.println("ERROR SEMANTICO -> Los parametros del range deben ser de tipo entero");System.exit(0);} 
                                             
                                             cod3D.append("\nfor_begin" + currentStruc + ":");
                                             String mitemp1 = "local_data_int " + val.toString();
@@ -4106,7 +4116,7 @@ cod3D.append("\ndefaultBlock" + casesCont + ":");
                                                 else {cod3D.append("\nreturn t" + currentTemp);};
                                                 currentReturns++;
 
-                                                if (!valido) {System.out.println("ERROR RETORNO -> Tipo de retorno distinto al de la funcion");}
+                                                if (!valido) {System.out.println("ERROR RETORNO -> Tipo de retorno distinto al de la funcion");System.exit(0);}
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("returnStruc",34, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-3)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
