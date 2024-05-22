@@ -11,43 +11,43 @@ begin_func_xd:
 local_data_int x22
 t1=a
 x22 = t1
-param1 xddd
+t2=xddd
 local_data_int var
-t2=2
-var = t2
-t3=12
-t4=10
-t5=3
+t3=2
+var = t3
+t4=12
+t5=10
+t6=3
 for_begin1:
 local_data_int i
 i = 12
-t6 = 10
-t7 = i < t6
-if t7 goto forBlock1
+t7 = 10
+t8 = i < t7
+if t8 goto forBlock1
 goto for_end1
 forBlock1:
-t8=xd
-print t8
+t9=xd
+print t9
 for_end_block1:
-t9 = 3
-i = t9 + i
-t10 = 10
-t11 = i < t10
-if t11 goto forBlock1
+t10 = 3
+i = t10 + i
+t11 = 10
+t12 = i < t11
+if t12 goto forBlock1
 for_end1:
 if_begin2:
-t12=2
 t13=2
-t14 = t13==t12
-if t14 goto ifblock2
+t14=2
+t15 = t14==t13
+if t15 goto ifblock2
 goto else_begin2
 ifblock2:
-t15=2
-print t15
-if_end2:
-else_begin2:
 t16=2
 print t16
+if_end2:
+else_begin2:
+t17=2
+print t17
 else_end2:
-t17=5
-return t17
+t18=5
+return t18
