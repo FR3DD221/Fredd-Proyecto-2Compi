@@ -3,12 +3,12 @@ glob:int:array:xd1[11]  = [1,2,2,2];
 
 func:int:xd_
         
-        loc:int:x22;
+        loc:int:x22 = "a";
         param:int:xddd;
         loc:int:var = 2;
         for:i:in:range(12, 10, 3)_print(xd);_
         if(2==2)_print(2);_else_print(2);_
-        
+        break;
         return:5;
 _
 
